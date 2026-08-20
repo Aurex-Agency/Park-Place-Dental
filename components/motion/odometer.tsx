@@ -13,6 +13,23 @@ type OdometerProps = {
 
 const DIGITS = Array.from({ length: 10 }, (_, n) => n);
 
+/**
+ * A plain-text run (prefix/suffix) sized and clipped exactly like
+ * DigitColumn below. Per the CSS inline-layout baseline rule, any inline-
+ * block with overflow other than visible gets its baseline synthesized from
+ * its bottom margin edge instead of its text — so prefix/suffix need the
+ * *same* box shape as the digit columns to land on the same synthesized
+ * baseline, or they visually float above/below the rolling digits.
+ */
+function TextRun({ text }: { text: string }) {
+  if (!text) return null;
+  return (
+    <span className="inline-block h-[1em] overflow-hidden align-baseline leading-[1em]">
+      {text}
+    </span>
+  );
+}
+
 function DigitColumn({ digit, delay, reducedMotion }: { digit: number; delay: number; reducedMotion: boolean }) {
   return (
     <span className="relative inline-block h-[1em] w-[0.62em] overflow-hidden align-baseline">
@@ -49,11 +66,11 @@ export function Odometer({ value, prefix, suffix, className }: OdometerProps) {
   const digits = Math.abs(Math.trunc(value)).toString().split("").map(Number);
 
   return (
-    <span ref={ref} className={`inline-flex items-baseline tabular-nums ${className ?? ""}`}>
+    <span ref={ref} className={`tabular-nums ${className ?? ""}`}>
       {/* Rolling digit strips render every 0-9 row in the DOM, which reads as
           gibberish to a screen reader — hide them and announce the real value instead. */}
-      <span aria-hidden="true" className="inline-flex items-baseline">
-        {prefix}
+      <span aria-hidden="true">
+        {prefix ? <TextRun text={prefix} /> : null}
         {inView
           ? digits.map((digit, index) => (
               <DigitColumn
@@ -64,9 +81,9 @@ export function Odometer({ value, prefix, suffix, className }: OdometerProps) {
               />
             ))
           : digits.map((_, index) => (
-              <span key={index} className="inline-block h-[1em] w-[0.62em]" />
+              <span key={index} className="inline-block h-[1em] w-[0.62em] align-baseline" />
             ))}
-        {suffix}
+        {suffix ? <TextRun text={suffix} /> : null}
       </span>
       <span className="sr-only">
         {prefix}

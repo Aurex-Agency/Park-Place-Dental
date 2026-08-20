@@ -95,7 +95,7 @@ export function PrimitivesSandbox() {
           <div className="flex flex-wrap gap-12 font-display text-d1 text-navy-mid">
             <Odometer value={42} suffix="yrs" />
             <Odometer value={12000} suffix="+" />
-            <Odometer value={49} prefix="4." suffix=" avg" />
+            <Odometer value={4} prefix="4." suffix=" avg" />
           </div>
         </Section>
 
