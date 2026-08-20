@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens transcribed from DESIGN-SYSTEM.md. This file is the ONLY
+ * place colors, type, spacing, radii, shadow, and motion values are defined
+ * (CLAUDE.md hard rule #1). Components consume these via Tailwind utilities
+ * or var(--token-name) — never hardcode a hex, px font-size, or duration.
+ */
+@theme {
+  /* ---- Base grid: 8px, per DESIGN-SYSTEM.md §2 ---- */
+  --spacing: 0.5rem;
+
+  /* ---- Color — §2 ---- */
+  --color-ink: #0f1a15;
+  --color-pine: #14372a;
+  --color-park: #1f6b4e;
+  --color-park-lift: #2a8a64;
+  --color-sage: #c7d8ce;
+
+  --color-ivory: #f7f4ed;
+  --color-bone: #ede7da;
+  --color-white: #ffffff;
+
+  --color-brass: #c08a3e;
+  --color-brass-lift: #d8a257;
+
+  --color-danger: #a33a2b;
+  --color-focus: #2a8a64;
+
+  /* ---- Fonts — §2 ---- */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-inter-tight), "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- Type scale (fluid) — §2 ---- */
+  --text-hero: clamp(3rem, 9vw, 9rem);
+  --text-d1: clamp(2.5rem, 6vw, 5.5rem);
+  --text-d2: clamp(2rem, 4vw, 3.5rem);
+  --text-h3: clamp(1.5rem, 2.5vw, 2rem);
+  --text-lead: clamp(1.125rem, 1.6vw, 1.375rem);
+  --text-body: 1.0625rem;
+  --text-small: 0.9375rem;
+  --text-eyebrow: 0.8125rem;
+
+  /* Tracking / leading called out explicitly in §2 for these scale steps */
+  --tracking-hero: -0.03em;
+  --leading-hero: 0.92;
+  --leading-lead: 1.5;
+  --tracking-eyebrow: 0.12em;
+
+  /* ---- Spacing & layout — §2 ---- */
+  --spacing-section: clamp(6rem, 12vw, 12rem);
+  --spacing-gutter: clamp(1.25rem, 5vw, 6rem);
+
+  /* ---- Radii — §2 ---- */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 28px;
+  --radius-pill: 9999px;
+
+  /* ---- Elevation — §2 (one soft shadow only, no stacked scale) ---- */
+  --shadow-soft: 0 2px 24px -8px rgb(15 26 21 / 0.18);
+
+  /* ---- Motion — §3 ---- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 200ms;
+  --dur-base: 650ms;
+  --dur-slow: 1100ms;
+  --stagger: 60ms;
+}
+
+/* Page max-width, referenced by the shell/container component (Phase 2) */
+:root {
+  --container-max: 1440px;
+}
+
+body {
+  background: var(--color-ivory);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
