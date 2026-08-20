@@ -57,19 +57,20 @@ DESIGN-SYSTEM.md
 3. Animate only `transform`, `opacity`, `clip-path`, `filter`.
 4. Every animated component must have a `prefers-reduced-motion: reduce` path that is tested, not assumed.
 5. Reveals use `viewport={{ once: true }}`. Nothing re-animates on scroll-back.
+6. **`rose`/`rose-lift` are never used for text below `--text-h3` (24px), and never for body copy, labels, or form text on `navy`.** Measured: rose on navy is 4.4:1 — clears the 3:1 large-text AA minimum, fails the 4.5:1 normal-text minimum. Large decorative headline text and accent underlines/icons only. See the live, computed check at `/dev/tokens`.
 
 **Content & compliance**
-6. **No AI-generated or stock images of people.** Not the dentist, staff, patients, or before/afters. Placeholders must be obvious gray boxes labeled `NEEDS REAL PHOTO: <description>` so nothing fake ships by accident.
-7. **No PHI collection.** Forms take name, phone, email, preferred window, general reason dropdown. Every form includes the line: "Please don't include medical details here — we'll take those by phone." Never add a free-text "describe your symptoms" field.
-8. **No medical claims, guarantees, or superlatives** ("best dentist," "painless," "guaranteed results"). State-board advertising rules and FTC substantiation both apply.
-9. NAP (name, address, phone) is defined once in `content/practice.ts` and imported everywhere. It must match the Google Business Profile character-for-character.
-10. Real copy only. No lorem ipsum — it hides layout problems and gets shipped.
+7. **No AI-generated or stock images of people.** Not the dentist, staff, patients, or before/afters. Placeholders must be obvious gray boxes labeled `NEEDS REAL PHOTO: <description>` so nothing fake ships by accident.
+8. **No PHI collection.** Forms take name, phone, email, preferred window, general reason dropdown. Every form includes the line: "Please don't include medical details here — we'll take those by phone." Never add a free-text "describe your symptoms" field.
+9. **No medical claims, guarantees, or superlatives** ("best dentist," "painless," "guaranteed results"). State-board advertising rules and FTC substantiation both apply.
+10. NAP (name, address, phone) is defined once in `content/practice.ts` and imported everywhere. It must match the Google Business Profile character-for-character.
+11. Real copy only. No lorem ipsum — it hides layout problems and gets shipped.
 
 **Quality gates**
-11. WCAG 2.2 AA. Keyboard-complete, visible focus, semantic HTML, real `<button>`/`<a>`. Treat a11y failures as build failures.
-12. Budgets: LCP < 2.0s, CLS < 0.05, INP < 200ms on mid-tier Android / 4G. Hero video ≤ 1.5MB with a `poster`. If motion and budget conflict, budget wins.
-13. Every page: unique `<title>` + meta description, OG image, canonical. Home + contact carry `Dentist` JSON-LD.
-14. `pnpm build && pnpm lint && pnpm test:a11y` must pass before any commit is proposed.
+12. WCAG 2.2 AA. Keyboard-complete, visible focus, semantic HTML, real `<button>`/`<a>`. Treat a11y failures as build failures.
+13. Budgets: LCP < 2.0s, CLS < 0.05, INP < 200ms on mid-tier Android / 4G. Hero video ≤ 1.5MB with a `poster`. If motion and budget conflict, budget wins.
+14. Every page: unique `<title>` + meta description, OG image, canonical. Home + contact carry `Dentist` JSON-LD.
+15. `pnpm build && pnpm lint && pnpm test:a11y` must pass before any commit is proposed.
 
 ## Working style
 

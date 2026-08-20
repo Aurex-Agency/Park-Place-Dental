@@ -1,10 +1,10 @@
 # Project Status — Park Place Dental V2
 
-**Read this first.** This is the handoff doc for picking up this project cold. Last updated 2026-08-20, end of Phase 1 (motion primitives), mid-review.
+**Read this first.** This is the handoff doc for picking up this project cold. Last updated 2026-08-20, end of the Phase 1 cleanup pass (`chore/phase-1-cleanup`), mid-review.
 
 ## Orientation
 
-This is a from-scratch rebuild of the Park Place Dental marketing site (general dental practice, Booneville, MS). It replaced an earlier, human-rejected creative direction (see `.claude` memory files if working from this machine — three prior rounds were rejected before this clean-slate restart). The current build follows `KICKOFF-PROMPT.md`'s phased script: **Phase 0 (scaffold) and Phase 1 (motion primitives) are built**; Phase 2 (nav shell) has not started.
+This is a from-scratch rebuild of the Park Place Dental marketing site (general dental practice, Booneville, MS). It replaced an earlier, human-rejected creative direction (see `.claude` memory files if working from this machine — three prior rounds were rejected before this clean-slate restart). The current build follows `KICKOFF-PROMPT.md`'s phased script: **Phase 0 (scaffold) and Phase 1 (motion primitives) are built, and a cleanup pass on Phase 1 is done**; Phase 2 (nav shell) has not started.
 
 Read in this order:
 1. `CLAUDE.md` — hard rules (design, compliance, quality gates). Overrides defaults.
@@ -18,9 +18,10 @@ Read in this order:
 - Remote: `https://github.com/Aurex-Agency/Park-Place-Dental.git` (this is a **new** repo — a prior remote, `Park-Place-Dental-Boone.git`, was replaced; don't confuse the two)
 - `main`: seeded as a fresh orphan commit (no history from any prior attempt). Currently holds only `CLAUDE.md`, `DESIGN-SYSTEM.md`, `WORKFLOW.md`.
 - `phase-0-scaffold` (off `main`): Next.js scaffold + full design tokens. **PR #1, open, not merged.**
-- `phase-1-primitives` (off `phase-0-scaffold`): the nine motion primitives + sandbox. **PR #2, open, not merged.** This is the current/latest branch — if you're picking up work, branch from here (or from wherever PR #2 lands after merge).
-- **Merge order matters**: PR #1 → `main` first, then PR #2 → `main` (or rebase PR #2 onto `main` post-merge). Neither has been merged yet — merging needs a human (the harness blocks the agent from merging PRs itself by design).
-- KICKOFF-PROMPT.md itself is committed only on `phase-0-scaffold`/`phase-1-primitives`, not yet on `main`.
+- `phase-1-primitives` (off `phase-0-scaffold`): the nine motion primitives + sandbox. **PR #2, open, not merged.**
+- `chore/phase-1-cleanup` (off `phase-1-primitives`): quality gate, stale-doc, callback-guard, and contrast-enforcement fixes — see below. **PR #3, open, not merged.** This is the current/latest branch — if you're picking up work, branch from here (or from wherever PR #3 lands after merges catch up).
+- **Merge order matters**: PR #1 → `main`, then PR #2 → `main`, then PR #3 → `main` (rebasing each onto `main` as it lands, since they're stacked). None have been merged yet — merging needs a human (the harness blocks the agent from merging PRs itself by design).
+- KICKOFF-PROMPT.md itself is committed only on `phase-0-scaffold`/`phase-1-primitives`/`chore/phase-1-cleanup`, not yet on `main`.
 
 ## What's built
 
@@ -47,7 +48,16 @@ All in `components/motion/`, exported from `components/motion/index.ts`: `Preloa
 - `Preloader` had a stale-closure risk on `onCompleteAction` in a mount-only effect — fixed via ref.
 - `WordRotator` keyed `AnimatePresence` on word text (collision risk for repeated words) — keyed by index instead.
 
-All were caught and fixed through human review of the live sandbox, not automated testing alone. **Known testing-environment limitation**: the browser automation tool used for verification runs in a backgrounded tab, which Chrome throttles heavily (`IntersectionObserver`/`requestAnimationFrame` barely fire) — this produced false "nothing renders" signals during debugging that turned out to be environment artifacts, not code bugs, confirmed by testing in the human's real browser. If something looks broken in an automated screenshot, verify with a real focused tab before concluding it's a code bug.
+All were caught and fixed through human review of the live sandbox, not automated testing alone. **Known testing-environment limitation**: the browser automation tool used for verification runs in a backgrounded tab, which Chrome throttles heavily (`IntersectionObserver`/`requestAnimationFrame` barely fire) — this produced false "nothing renders" signals during debugging that turned out to be environment artifacts, not code bugs, confirmed by testing in the human's real browser. If something looks broken in an automated screenshot, verify with a real focused tab before concluding it's a code bug. This recurred during the cleanup pass below (see the ThemeSection stability test) — it's a standing characteristic of this environment, not a one-off.
+
+## Phase 1 cleanup (PR #3: `chore/phase-1-cleanup`)
+
+Four scoped fixes, no Phase 2 work:
+
+1. **The quality gate is now real.** CLAUDE.md's rule (build+lint+`test:a11y` before every commit) referenced a script that didn't exist. Added `tests/routes.ts` (the route manifest — Phase 3 should only ever need to add entries here), Playwright + `@axe-core/playwright` (`tests/a11y.spec.ts`, every route tested twice — normal and `prefers-reduced-motion: reduce`), and `@lhci/cli` + `lighthouserc.json` against CLAUDE.md's actual budgets. `pnpm test:a11y` is green (verified across many consecutive runs — building it surfaced a real ~1-in-5 flake from `WordRotator`'s perpetual cycling landing mid-crossfade on a snapshot, absorbed with a bounded retry, not hidden). **`pnpm lhci` is NOT green**: LCP is 2700–3300ms against the 2000ms budget on all three routes, even for plain-text LCP elements, under simulated mobile throttling. Not fixed — reported honestly, budget not loosened. See Outstanding below.
+2. **Stale palette references killed.** KICKOFF-PROMPT.md and WORKFLOW.md still described evergreen/ivory/brass after the palette swap. WORKFLOW.md's Higgsfield asset-generation table got an actual creative rewrite (rose-gold accent role, not a find-and-replace).
+3. **Callback-identity landmine guarded.** `ThemeSection.onThemeChangeAction` and `StickySteps`' internal `onEnter` called a consumer callback from an effect that listed the callback in its own deps — the exact shape that already caused one infinite-loop bug (fixed previously at the call site, not the primitive). Both now use the latest-ref pattern `Preloader` already used for `onCompleteAction`. `StickySteps` gained a small new public prop, `onActiveIndexChangeAction`, specifically so the fix is provable against an external consumer, not just asserted.
+4. **Rose-on-navy contrast limit made hard to violate.** Was prose-only in DESIGN-SYSTEM.md (4.4:1, large-text-only). `/dev/tokens` now shows explicit pass/fail badges against both AA thresholds (4.5:1 normal, 3:1 large) with an unmissable warning row for large-text-only pairs. Added CLAUDE.md hard rule #6 (rose/rose-lift never below `--text-h3`/24px, never for body/label/form text on navy) — **this renumbered every rule after it** (old 6–14 → new 7–15); references to old numbers in `tests/a11y.spec.ts` and `playwright.config.ts` were updated, rule #4 (reduced-motion) didn't move so its references elsewhere are untouched.
 
 ## Non-obvious project facts
 
@@ -57,7 +67,9 @@ All were caught and fixed through human review of the live sandbox, not automate
 
 ## Outstanding / needs human action
 
-- **Merge PR #1 then PR #2** (or direct the next session to do it) — both open, unmerged.
+- **Merge PR #1, then PR #2, then PR #3** (or direct the next session to do it) — all three open, unmerged.
+- **LCP budget miss** (found in the cleanup pass): 2700–3300ms against the 2000ms budget on all three routes, per `pnpm lhci`. Even plain-text LCP elements are this slow under simulated mobile throttling — worth a real performance investigation before Phase 2 adds more content/weight. Not investigated yet; deliberately out of scope for the gate-infrastructure cleanup task.
+- `CLEANUP-PROMPT.md` sits in the repo root as an untracked file (the prompt that drove this cleanup pass) — never committed anywhere. Not part of any task's scope. A human should decide whether it gets committed like `KICKOFF-PROMPT.md` was, or left local/deleted.
 - `TODO(kalob)` placeholders still open in `content/practice.ts`: hours, dentist credentials, service list, insurances, social links, form endpoint. Get these from the client directly, not from old mockups.
 - Real logo hex sampling hasn't happened — current navy/rose/cream values are a proposal, not sampled from brand assets.
 - No real photography yet — `/dev/primitives`' `RevealImage` demo uses an obvious placeholder SVG (`public/dev/placeholder.svg`), per CLAUDE.md's no-fake-photos rule.

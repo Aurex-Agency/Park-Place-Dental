@@ -39,3 +39,15 @@ export function wcagLevel(ratio: number): WcagLevel {
   if (ratio >= 3) return "AA-large";
   return "fail";
 }
+
+/** WCAG 2.2 AA minimums. Named so a threshold change is a one-line diff, not a grep. */
+export const AA_NORMAL_TEXT_MIN = 4.5;
+export const AA_LARGE_TEXT_MIN = 3.0;
+
+export function passesNormalText(ratio: number): boolean {
+  return ratio >= AA_NORMAL_TEXT_MIN;
+}
+
+export function passesLargeText(ratio: number): boolean {
+  return ratio >= AA_LARGE_TEXT_MIN;
+}
