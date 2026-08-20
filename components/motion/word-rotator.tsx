@@ -36,7 +36,7 @@ export function WordRotator({ words, className, holdMs = 2200 }: WordRotatorProp
     <span className={`relative inline-block overflow-hidden align-bottom ${className ?? ""}`}>
       <AnimatePresence mode="wait">
         <motion.span
-          key={words[index]}
+          key={index}
           className="block"
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

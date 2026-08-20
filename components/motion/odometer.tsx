@@ -13,26 +13,9 @@ type OdometerProps = {
 
 const DIGITS = Array.from({ length: 10 }, (_, n) => n);
 
-/**
- * A plain-text run (prefix/suffix) sized and clipped exactly like
- * DigitColumn below. Per the CSS inline-layout baseline rule, any inline-
- * block with overflow other than visible gets its baseline synthesized from
- * its bottom margin edge instead of its text — so prefix/suffix need the
- * *same* box shape as the digit columns to land on the same synthesized
- * baseline, or they visually float above/below the rolling digits.
- */
-function TextRun({ text }: { text: string }) {
-  if (!text) return null;
-  return (
-    <span className="inline-block h-[1em] overflow-hidden align-baseline leading-[1em]">
-      {text}
-    </span>
-  );
-}
-
 function DigitColumn({ digit, delay, reducedMotion }: { digit: number; delay: number; reducedMotion: boolean }) {
   return (
-    <span className="relative inline-block h-[1em] w-[0.62em] overflow-hidden align-baseline">
+    <span className="relative inline-block h-[1em] w-[0.62em] overflow-hidden">
       <motion.span
         className="absolute inset-0 flex flex-col"
         initial={{ y: 0 }}
@@ -58,6 +41,16 @@ function DigitColumn({ digit, delay, reducedMotion }: { digit: number; delay: nu
  * translates to the target row once the whole number is in view. Under
  * reduced motion the columns snap straight to the final value (duration 0)
  * instead of rolling — satisfies "odometers show final value."
+ *
+ * The row uses flex align-items:center, not baseline. DigitColumn needs
+ * overflow-hidden to clip the unrolled digit rows, and per the CSS inline-
+ * layout spec, any box with overflow other than visible gets its baseline
+ * synthesized from its bottom margin edge rather than real font metrics —
+ * that mismatched against prefix/suffix's actual text baseline (digits
+ * rendered too high). Clipping prefix/suffix to the same box shape "fixed"
+ * that but clipped descenders like the "g" in "avg" instead. Centering
+ * sidesteps baseline synthesis entirely: no font-metric math, and text stays
+ * unclipped.
  */
 export function Odometer({ value, prefix, suffix, className }: OdometerProps) {
   const reducedMotion = useMotionPreference();
@@ -66,11 +59,11 @@ export function Odometer({ value, prefix, suffix, className }: OdometerProps) {
   const digits = Math.abs(Math.trunc(value)).toString().split("").map(Number);
 
   return (
-    <span ref={ref} className={`tabular-nums ${className ?? ""}`}>
+    <span ref={ref} className={`inline-flex items-center tabular-nums ${className ?? ""}`}>
       {/* Rolling digit strips render every 0-9 row in the DOM, which reads as
           gibberish to a screen reader — hide them and announce the real value instead. */}
-      <span aria-hidden="true">
-        {prefix ? <TextRun text={prefix} /> : null}
+      <span aria-hidden="true" className="inline-flex items-center">
+        {prefix}
         {inView
           ? digits.map((digit, index) => (
               <DigitColumn
@@ -81,9 +74,9 @@ export function Odometer({ value, prefix, suffix, className }: OdometerProps) {
               />
             ))
           : digits.map((_, index) => (
-              <span key={index} className="inline-block h-[1em] w-[0.62em] align-baseline" />
+              <span key={index} className="inline-block h-[1em] w-[0.62em]" />
             ))}
-        {suffix ? <TextRun text={suffix} /> : null}
+        {suffix}
       </span>
       <span className="sr-only">
         {prefix}

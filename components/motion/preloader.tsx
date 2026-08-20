@@ -1,7 +1,7 @@
 "use client";
 
 import { animate, motion, useMotionValue, useTransform } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMotionPreference } from "./motion-preference";
 
 const SESSION_KEY = "ppd-preloader-seen";
@@ -41,6 +41,16 @@ export function Preloader({ onCompleteAction }: { onCompleteAction?: () => void 
   const [displayCount, setDisplayCount] = useState(0);
   const roundedCount = useTransform(count, (v) => Math.round(v));
 
+  // The mount effect below must run exactly once (it starts a single count
+  // animation + hard-timeout), so onCompleteAction can't be a dep — but a
+  // parent could still pass a new function reference each render. Reading it
+  // through a ref, kept current via its own effect, avoids ever calling a
+  // stale closure without needing the mount effect to re-run.
+  const onCompleteRef = useRef(onCompleteAction);
+  useEffect(() => {
+    onCompleteRef.current = onCompleteAction;
+  }, [onCompleteAction]);
+
   useEffect(() => {
     const unsubscribe = roundedCount.on("change", setDisplayCount);
     return unsubscribe;
@@ -53,14 +63,14 @@ export function Preloader({ onCompleteAction }: { onCompleteAction?: () => void 
       // effect is the one legitimate place to make that call.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setPhase("done");
-      onCompleteAction?.();
+      onCompleteRef.current?.();
       return;
     }
 
     if (reducedMotion) {
       markSeenThisSession();
       setPhase("done");
-      onCompleteAction?.();
+      onCompleteRef.current?.();
       return;
     }
 
@@ -74,24 +84,24 @@ export function Preloader({ onCompleteAction }: { onCompleteAction?: () => void 
 
     const hardTimeout = setTimeout(() => {
       setPhase("done");
-      onCompleteAction?.();
+      onCompleteRef.current?.();
     }, HARD_TIMEOUT_MS);
 
     return () => {
       countAnimation.stop();
       clearTimeout(hardTimeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on mount by design
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on mount by design; onCompleteAction is read via ref
   }, []);
 
   useEffect(() => {
     if (phase !== "exiting") return;
     const timer = setTimeout(() => {
       setPhase("done");
-      onCompleteAction?.();
+      onCompleteRef.current?.();
     }, CURTAIN_DURATION_MS);
     return () => clearTimeout(timer);
-  }, [phase, onCompleteAction]);
+  }, [phase]);
 
   if (phase === "done") return null;
 

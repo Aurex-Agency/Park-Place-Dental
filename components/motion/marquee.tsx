@@ -14,8 +14,11 @@ type MarqueeProps = {
 /**
  * Seamless infinite ticker — CSS keyframes on a duplicated track, no JS
  * animation loop (WORKFLOW.md: don't burn main-thread time on this). Pauses
- * on hover and freezes under reduced motion via globals.css selectors keyed
- * on data-reduced-motion / data-marquee.
+ * on hover *or keyboard focus* and freezes under reduced motion via
+ * globals.css selectors keyed on data-reduced-motion / data-marquee.
+ * Hover-only pausing fails WCAG 2.2.2 (Pause, Stop, Hide) for anyone who
+ * can't hover — tabIndex makes the track focusable so keyboard users get an
+ * equivalent way to stop it moving.
  */
 export function Marquee({ children, speed = 24, direction = "forward", className }: MarqueeProps) {
   const reducedMotion = useMotionPreference();
@@ -24,7 +27,9 @@ export function Marquee({ children, speed = 24, direction = "forward", className
     <div
       data-marquee
       data-reduced-motion={reducedMotion}
-      className={`overflow-hidden ${className ?? ""}`}
+      tabIndex={0}
+      aria-label="Scrolling list, focus or hover to pause"
+      className={`overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 ${className ?? ""}`}
     >
       <div
         className="marquee-track flex w-max"

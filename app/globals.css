@@ -97,7 +97,7 @@ body {
   --section-bg: var(--color-cream);
   --section-fg: var(--color-ink);
 }
-[data-reduced-motion="true"] .theme-section {
+.theme-section[data-reduced-motion="true"] {
   transition-duration: 0ms !important;
 }
 
@@ -118,6 +118,7 @@ body {
   animation-direction: reverse;
 }
 [data-marquee]:hover .marquee-track,
+[data-marquee]:focus-visible .marquee-track,
 [data-reduced-motion="true"] .marquee-track {
   animation-play-state: paused;
 }
