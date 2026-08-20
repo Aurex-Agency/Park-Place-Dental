@@ -7,7 +7,7 @@ import { practice } from "@/content/practice";
 export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-24 text-center">
-      <p className="text-eyebrow uppercase tracking-eyebrow text-park">
+      <p className="text-eyebrow uppercase tracking-eyebrow text-navy-mid">
         Site under construction
       </p>
       <h1 className="font-display text-d2 text-ink">{practice.name}</h1>

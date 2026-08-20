@@ -11,21 +11,21 @@
   --spacing: 0.5rem;
 
   /* ---- Color — §2 ---- */
-  --color-ink: #0f1a15;
-  --color-pine: #14372a;
-  --color-park: #1f6b4e;
-  --color-park-lift: #2a8a64;
-  --color-sage: #c7d8ce;
+  --color-ink: #0b1220;
+  --color-navy: #16233f;
+  --color-navy-mid: #2e4e86;
+  --color-navy-lift: #3e64a3;
+  --color-mist: #c7d2e0;
 
-  --color-ivory: #f7f4ed;
-  --color-bone: #ede7da;
+  --color-cream: #f8f3ea;
+  --color-sand: #efe4d2;
   --color-white: #ffffff;
 
-  --color-brass: #c08a3e;
-  --color-brass-lift: #d8a257;
+  --color-rose: #b8776a;
+  --color-rose-lift: #c99184;
 
   --color-danger: #a33a2b;
-  --color-focus: #2a8a64;
+  --color-focus: #3e64a3;
 
   /* ---- Fonts — §2 ---- */
   --font-display: var(--font-fraunces), Georgia, serif;
@@ -58,7 +58,7 @@
   --radius-pill: 9999px;
 
   /* ---- Elevation — §2 (one soft shadow only, no stacked scale) ---- */
-  --shadow-soft: 0 2px 24px -8px rgb(15 26 21 / 0.18);
+  --shadow-soft: 0 2px 24px -8px rgb(11 18 32 / 0.18);
 
   /* ---- Motion — §3 ---- */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -75,7 +75,7 @@
 }
 
 body {
-  background: var(--color-ivory);
+  background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-body);
 }

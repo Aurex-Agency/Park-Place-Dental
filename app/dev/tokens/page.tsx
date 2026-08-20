@@ -7,25 +7,25 @@ export const metadata: Metadata = {
 };
 
 const COLORS = {
-  ink: "#0f1a15",
-  pine: "#14372a",
-  park: "#1f6b4e",
-  "park-lift": "#2a8a64",
-  sage: "#c7d8ce",
-  ivory: "#f7f4ed",
-  bone: "#ede7da",
+  ink: "#0b1220",
+  navy: "#16233f",
+  "navy-mid": "#2e4e86",
+  "navy-lift": "#3e64a3",
+  mist: "#c7d2e0",
+  cream: "#f8f3ea",
+  sand: "#efe4d2",
   white: "#ffffff",
-  brass: "#c08a3e",
-  "brass-lift": "#d8a257",
+  rose: "#b8776a",
+  "rose-lift": "#c99184",
   danger: "#a33a2b",
-  focus: "#2a8a64",
+  focus: "#3e64a3",
 } as const;
 
 const VERIFIED_PAIRS: Array<{ fg: keyof typeof COLORS; bg: keyof typeof COLORS; context: string }> = [
-  { fg: "ink", bg: "ivory", context: "body text" },
-  { fg: "ivory", bg: "pine", context: "dark section text" },
-  { fg: "white", bg: "park", context: "primary button text" },
-  { fg: "brass", bg: "pine", context: "accent on dark" },
+  { fg: "ink", bg: "cream", context: "body text" },
+  { fg: "cream", bg: "navy", context: "dark section text" },
+  { fg: "white", bg: "navy-mid", context: "primary button text" },
+  { fg: "rose", bg: "navy", context: "accent on dark" },
 ];
 
 const TYPE_SCALE = [
@@ -118,7 +118,7 @@ export default function TokensPage() {
                       className={
                         level === "fail"
                           ? "text-danger"
-                          : "text-park"
+                          : "text-navy-mid"
                       }
                     >
                       {level}
@@ -174,7 +174,7 @@ export default function TokensPage() {
         <div className="mt-6 flex flex-wrap gap-6">
           {RADII.map(({ token, className, value }) => (
             <div key={token} className="flex flex-col items-center gap-2">
-              <div className={`h-16 w-16 bg-park ${className}`} />
+              <div className={`h-16 w-16 bg-navy-mid ${className}`} />
               <p className="text-small text-ink/60">
                 {token} · {value}
               </p>
