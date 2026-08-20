@@ -1,6 +1,6 @@
 # Park Place Dental — Design System
 
-Reference DNA: `impilo.health`. We are borrowing its **structure and motion grammar**, not its look. Nothing violet, nothing SaaS-blue, no dashboard screenshots.
+Reference DNA: `impilo.health`. We are borrowing its **structure and motion grammar**, not its look. Nothing violet, no bright SaaS-gradient blue, no dashboard screenshots. (Our navy is deep and warm, not a SaaS gradient.)
 
 ---
 
@@ -17,7 +17,7 @@ Deconstructed, so we can rebuild it deliberately instead of vibes-copying:
 | Infinite **"KEEP SCROLLING" marquee** | Cheap, confident, fills dead space | Marquee of service names |
 | Buttons with **duplicated labels** that slide on hover | Tiny, premium, everyone notices | Same primitive, one component |
 | **Pinned numbered steps** `01. 02. 03. 04.` | Turns a boring process into the spine of the page | "Your first visit, start to finish" |
-| **Section-level color inversion** on scroll | Page feels like chapters | Ivory → Deep Green → Ivory |
+| **Section-level color inversion** on scroll | Page feels like chapters | Cream → Deep Navy → Cream |
 | Generous negative space + oversized type | Reads as expensive | Same, harder |
 
 **The trap to avoid:** Impilo is B2B infrastructure. We are a local dental practice in a town of ~8,600. Every motion flourish has to survive the question *"does this make a nervous 45-year-old in Prentiss County more likely to call?"* If it doesn't, cut it.
@@ -29,7 +29,7 @@ Deconstructed, so we can rebuild it deliberately instead of vibes-copying:
 Logo exists; palette and type are open. **Sample the logo first** and reconcile — everything below is the proposal, not the law.
 
 ### The idea
-"Park Place" earns green honestly — parks, calm, and the Monopoly-blue-chip association of *the premium property on the board*. So: **deep evergreen + warm ivory + brass**. Confident, warm, adult. Zero resemblance to the cyan-gradient-and-stock-smile template every other dental site in Mississippi uses.
+Deep navy reads as competent and calm without reading as cold or clinical — the opposite of a sterile white dental office. Warm cream keeps it from tipping into corporate/financial-institution territory, and a touch of rose gold gives it the warmth and specificity that a plain navy-and-white site lacks: **deep navy + warm cream + rose gold**. Confident, warm, adult. Zero resemblance to the cyan-gradient-and-stock-smile template every other dental site in Mississippi uses.
 
 ### Color tokens
 
@@ -37,30 +37,30 @@ Logo exists; palette and type are open. **Sample the logo first** and reconcile 
 /* Tailwind v4 — app/globals.css */
 @theme {
   /* Core */
-  --color-ink:        #0F1A15;  /* near-black green. body text, dark sections */
-  --color-pine:       #14372A;  /* primary brand. dark section bg */
-  --color-park:       #1F6B4E;  /* primary action green */
-  --color-park-lift:  #2A8A64;  /* hover state */
-  --color-sage:       #C7D8CE;  /* muted accents, dividers on dark */
+  --color-ink:        #0B1220;  /* near-black navy. body text, dark sections */
+  --color-navy:        #16233F;  /* primary brand. dark section bg */
+  --color-navy-mid:    #2E4E86;  /* primary action blue */
+  --color-navy-lift:   #3E64A3;  /* hover state */
+  --color-mist:        #C7D2E0;  /* muted accents, dividers on dark */
 
   /* Surfaces */
-  --color-ivory:      #F7F4ED;  /* default page bg — NOT pure white */
-  --color-bone:       #EDE7DA;  /* alternating band */
+  --color-cream:      #F8F3EA;  /* default page bg — NOT pure white */
+  --color-sand:       #EFE4D2;  /* alternating band */
   --color-white:      #FFFFFF;  /* cards only */
 
   /* Accent — use sparingly, <5% of any viewport */
-  --color-brass:      #C08A3E;
-  --color-brass-lift: #D8A257;
+  --color-rose:       #B8776A;
+  --color-rose-lift:  #C99184;
 
   /* Feedback */
   --color-danger:     #A33A2B;  /* emergency / urgent CTA only */
-  --color-focus:      #2A8A64;
+  --color-focus:      #3E64A3;
 }
 ```
 
-**Ratios:** 60% ivory/bone · 25% pine/ink · 10% park · 5% brass. Emergency-dental CTA is the only place `--color-danger` appears.
+**Ratios:** 60% cream/sand · 25% navy/ink · 10% navy-mid · 5% rose. Emergency-dental CTA is the only place `--color-danger` appears.
 
-**Contrast, non-negotiable:** every pairing below must clear WCAG AA (4.5:1 body, 3:1 large text). Verified pairs: `ink on ivory` (14.8:1), `ivory on pine` (12.1:1), `white on park` (4.9:1), `brass on pine` (5.2:1). Do not invent new pairs without re-checking.
+**Contrast, non-negotiable:** every pairing below must clear WCAG AA (4.5:1 body, 3:1 large text). Verified pairs (computed, see `/dev/tokens`): `ink on cream` (16.9:1), `cream on navy` (14.1:1), `white on navy-mid` (8.2:1), `navy-lift on cream` (5.3:1). `rose on navy` is 4.4:1 — AA for large text/accents only, not small body text.
 
 ### Typography
 
@@ -92,7 +92,7 @@ Max measure for prose: `68ch`. Headlines: `18ch`.
 
 8px base grid. Section rhythm: `clamp(6rem, 12vw, 12rem)` vertical padding.
 
-Grid: 12-col, `max-width: 1440px`, gutters `clamp(1.25rem, 5vw, 6rem)`. Radii: `--radius-sm: 8px`, `--radius-md: 16px`, `--radius-lg: 28px`, pills `9999px`. Elevation: one soft shadow only — `0 2px 24px -8px rgb(15 26 21 / 0.18)`. No stacked shadow scale.
+Grid: 12-col, `max-width: 1440px`, gutters `clamp(1.25rem, 5vw, 6rem)`. Radii: `--radius-sm: 8px`, `--radius-md: 16px`, `--radius-lg: 28px`, pills `9999px`. Elevation: one soft shadow only — `0 2px 24px -8px rgb(11 18 32 / 0.18)`. No stacked shadow scale.
 
 ---
 
@@ -125,7 +125,7 @@ Grid: 12-col, `max-width: 1440px`, gutters `clamp(1.25rem, 5vw, 6rem)`. Radii: `
 | `<WordRotator>` | Cycles an array of words in the hero, 2.2s hold, y-slide swap. Pauses on `reduce`. |
 | `<Odometer>` | Digit columns roll to a target number when in view. `tabular-nums`. Supports prefix/suffix (`+`, `%`, `yrs`). |
 | `<Marquee>` | Seamless infinite ticker, CSS-only via duplicated track. `speed` and `direction` props. Pauses on hover. |
-| `<SwapButton>` | Two stacked copies of the label in an `overflow:hidden` box; on hover/focus both slide up one line-height. Focus-visible triggers it too. Variants: `primary` (park), `ghost` (outlined), `danger` (emergency). |
+| `<SwapButton>` | Two stacked copies of the label in an `overflow:hidden` box; on hover/focus both slide up one line-height. Focus-visible triggers it too. Variants: `primary` (navy-mid), `ghost` (outlined), `danger` (emergency). |
 | `<StickySteps>` | `position: sticky` numbered panels `01–04`. Left column pins the number + short label, right column scrolls the detail. Collapses to a plain stacked list under `md`. |
 | `<RevealImage>` | `clip-path: inset(100% 0 0 0) → inset(0)` with a slight `scale(1.08) → 1` on the inner img. |
 | `<ThemeSection>` | Wrapper that sets `data-theme="dark|light"` and transitions bg/text color over 600ms as it enters. Nav logo/link colors read the same attribute and invert. |
@@ -144,13 +144,13 @@ Optional, only if it earns its keep: a subtle magnetic hover on the primary CTA.
 4. **"Allowing you to focus on…" analogue** — one large calm statement + `KEEP SCROLLING` ticker
 5. **`<StickySteps>` — "Your first visit, start to finish" `01–04`**: Book in under a minute → What we do at your first exam → Your plan and what it costs, before we start → Ongoing care that fits your schedule. *This is the highest-converting section on the page. It kills the two real objections: "will it hurt" and "what will it cost."*
 6. **Services grid** — 6 cards with `<RevealImage>`: General & Preventive · Cosmetic · Restorative · Emergency · Children's · Implants & Whitening
-7. **`<Odometer>` stat band** on `pine` — years serving Prentiss County, patients cared for, average review rating, same-day emergency slots
+7. **`<Odometer>` stat band** on `navy` — years serving Prentiss County, patients cared for, average review rating, same-day emergency slots
 8. **Meet the team** — real photography, warm, `<RevealImage>` on hover
 9. **Reviews** — real Google reviews, name + first initial. Pull statically at build; do not embed a third-party widget (it will wreck LCP and leak trackers).
 10. **Smile gallery teaser** — before/after slider, practice's own photos, consent on file
 11. **Insurance & payment** — logos + "we'll check your benefits before you sit down"
 12. **Location** — map, hours, parking note, "serving Booneville, Baldwyn, Rienzi, Jumpertown, New Site, Blue Mountain"
-13. **Big CTA footer** — full-bleed `pine`, oversized `<SplitReveal>`, `<SwapButton>`
+13. **Big CTA footer** — full-bleed `navy`, oversized `<SplitReveal>`, `<SwapButton>`
 
 ### Routes
 
