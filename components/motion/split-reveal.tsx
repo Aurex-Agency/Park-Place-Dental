@@ -13,13 +13,17 @@ type SplitRevealProps = {
 };
 
 function Line({ line, delay, reducedMotion }: { line: string; delay: number; reducedMotion: boolean }) {
+  // The ref for useInView must sit on this untransformed wrapper, not on the
+  // motion.span below — that span starts translateY(105%), and
+  // IntersectionObserver measures the *current* (post-transform) rect, so
+  // watching the transformed element itself can shift it out of the
+  // detection margin and the reveal never fires.
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-15% 0px" });
 
   return (
-    <span className="block overflow-hidden">
+    <span ref={ref} className="block overflow-hidden">
       <motion.span
-        ref={ref}
         className="block"
         initial={{ y: reducedMotion ? 0 : "105%", opacity: 0 }}
         animate={inView ? { y: 0, opacity: 1 } : undefined}
