@@ -80,7 +80,7 @@ export default function TokensPage() {
               <div className="h-20" style={{ backgroundColor: hex }} />
               <div className="bg-white px-3 py-2">
                 <p className="text-small font-medium text-ink">{name}</p>
-                <p className="text-small text-ink/60">{hex}</p>
+                <p className="text-small text-ink/70">{hex}</p>
               </div>
             </div>
           ))}
@@ -125,8 +125,13 @@ export default function TokensPage() {
                     </span>
                   </td>
                   <td className="py-3">
+                    {/* text-h3's clamp floor is 24px — the WCAG large-text
+                        threshold — so this preview never renders at a size
+                        that would need the pair to clear the small-text
+                        4.5:1 bar it might not meet (see Task 4 for the
+                        explicit per-pair minimum-size guidance). */}
                     <span
-                      className="inline-block rounded-sm px-3 py-1 text-small"
+                      className="inline-block rounded-sm px-4 py-2 text-h3"
                       style={{ backgroundColor: COLORS[bg], color: COLORS[fg] }}
                     >
                       Aa
@@ -144,7 +149,7 @@ export default function TokensPage() {
         <div className="mt-6 flex flex-col gap-6">
           {TYPE_SCALE.map(({ token, className, note }) => (
             <div key={token} className="border-b border-ink/10 pb-6">
-              <p className="text-small text-ink/50">
+              <p className="text-small text-ink/70">
                 {token}
                 {note ? ` — ${note}` : ""}
               </p>
@@ -161,9 +166,9 @@ export default function TokensPage() {
         <div className="mt-6 flex flex-col gap-3">
           {SPACING_SCALE.map(({ token, value, note }) => (
             <div key={token} className="flex items-baseline gap-4 text-body">
-              <code className="w-48 shrink-0 text-small text-ink/50">{token}</code>
+              <code className="w-48 shrink-0 text-small text-ink/70">{token}</code>
               <span className="text-ink">{value}</span>
-              <span className="text-small text-ink/50">{note}</span>
+              <span className="text-small text-ink/70">{note}</span>
             </div>
           ))}
         </div>
@@ -175,7 +180,7 @@ export default function TokensPage() {
           {RADII.map(({ token, className, value }) => (
             <div key={token} className="flex flex-col items-center gap-2">
               <div className={`h-16 w-16 bg-navy-mid ${className}`} />
-              <p className="text-small text-ink/60">
+              <p className="text-small text-ink/70">
                 {token} · {value}
               </p>
             </div>

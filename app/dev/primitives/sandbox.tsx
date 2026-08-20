@@ -103,14 +103,14 @@ export function PrimitivesSandbox() {
           <div className="flex flex-col gap-6">
             <Marquee speed={18}>
               {["General & Preventive", "Cosmetic", "Restorative", "Emergency", "Children's", "Implants & Whitening"].map((service) => (
-                <span key={service} className="px-8 text-h3 text-ink/40">
+                <span key={service} className="px-8 text-h3 text-ink/50">
                   {service}
                 </span>
               ))}
             </Marquee>
             <Marquee speed={18} direction="reverse">
               {["General & Preventive", "Cosmetic", "Restorative", "Emergency", "Children's", "Implants & Whitening"].map((service) => (
-                <span key={service} className="px-8 text-h3 text-ink/40">
+                <span key={service} className="px-8 text-h3 text-ink/50">
                   {service}
                 </span>
               ))}
