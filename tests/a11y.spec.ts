@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import type { Result } from "axe-core";
 import { routes } from "./routes";
 
-/** CLAUDE.md rule #11: WCAG 2.2 AA. */
+/** CLAUDE.md rule #12: WCAG 2.2 AA. */
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 function formatViolations(violations: Result[]): string {

@@ -60,7 +60,7 @@ Deep navy reads as competent and calm without reading as cold or clinical — th
 
 **Ratios:** 60% cream/sand · 25% navy/ink · 10% navy-mid · 5% rose. Emergency-dental CTA is the only place `--color-danger` appears.
 
-**Contrast, non-negotiable:** every pairing below must clear WCAG AA (4.5:1 body, 3:1 large text). Verified pairs (computed, see `/dev/tokens`): `ink on cream` (16.9:1), `cream on navy` (14.1:1), `white on navy-mid` (8.2:1), `navy-lift on cream` (5.3:1). `rose on navy` is 4.4:1 — AA for large text/accents only, not small body text.
+**Contrast, non-negotiable:** every pairing below must clear WCAG AA (4.5:1 body, 3:1 large text). Verified pairs (computed, see `/dev/tokens`, which flags any pair under 4.5:1 with an explicit warning): `ink on cream` (16.9:1), `cream on navy` (14.1:1), `white on navy-mid` (8.2:1), `navy-lift on cream` (5.3:1). `rose`/`rose-lift` on `navy` is 4.4:1 — clears the 3:1 large-text minimum, fails the 4.5:1 normal-text minimum. This isn't just a note: CLAUDE.md's Design hard rules make it enforceable — `rose`/`rose-lift` text below `--text-h3` (24px), or any body copy/label/form text on `navy`, is not allowed, full stop.
 
 ### Typography
 

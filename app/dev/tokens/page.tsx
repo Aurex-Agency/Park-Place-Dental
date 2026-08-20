@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { contrastRatio, wcagLevel } from "@/lib/contrast";
+import { Fragment } from "react";
+import { contrastRatio, passesLargeText, passesNormalText } from "@/lib/contrast";
 
 export const metadata: Metadata = {
   title: "Dev — Design Tokens",
@@ -61,6 +62,20 @@ const MOTION_TOKENS = [
   { token: "--stagger", value: "60ms", use: "stagger delay" },
 ] as const;
 
+function ThresholdBadge({ pass }: { pass: boolean }) {
+  return (
+    <span
+      className={
+        pass
+          ? "inline-flex items-center gap-1 rounded-pill bg-navy-mid/10 px-2 py-1 text-small font-medium text-navy-mid"
+          : "inline-flex items-center gap-1 rounded-pill bg-danger/10 px-2 py-1 text-small font-medium text-danger"
+      }
+    >
+      {pass ? "✓ pass" : "✗ fail"}
+    </span>
+  );
+}
+
 export default function TokensPage() {
   return (
     <main className="mx-auto flex max-w-[var(--container-max)] flex-col gap-16 px-gutter py-section">
@@ -90,7 +105,10 @@ export default function TokensPage() {
       <section>
         <h2 className="font-display text-h3 text-ink">Verified contrast pairs</h2>
         <p className="mt-2 text-body text-ink/70">
-          Computed with the WCAG relative-luminance formula, not restated by hand.
+          Computed with the WCAG relative-luminance formula, not restated by hand. Every pair is
+          checked against both AA minimums — 4.5:1 for normal text, 3:1 for large text
+          (≥24px / <code>--text-h3</code> and up, per WCAG&rsquo;s large-text definition). A pair
+          that only clears the large-text bar gets a warning row you can&rsquo;t miss.
         </p>
         <table className="mt-6 w-full border-collapse text-left text-body">
           <thead>
@@ -98,46 +116,68 @@ export default function TokensPage() {
               <th className="py-2 pr-4">Pair</th>
               <th className="py-2 pr-4">Context</th>
               <th className="py-2 pr-4">Ratio</th>
-              <th className="py-2 pr-4">Level</th>
+              <th className="py-2 pr-4">Normal text (4.5:1)</th>
+              <th className="py-2 pr-4">Large text (3:1)</th>
               <th className="py-2">Preview</th>
             </tr>
           </thead>
           <tbody>
             {VERIFIED_PAIRS.map(({ fg, bg, context }) => {
               const ratio = contrastRatio(COLORS[fg], COLORS[bg]);
-              const level = wcagLevel(ratio);
+              const normalOk = passesNormalText(ratio);
+              const largeOk = passesLargeText(ratio);
+              const largeTextOnly = !normalOk && largeOk;
+              const failsEverything = !largeOk;
               return (
-                <tr key={`${fg}-${bg}`} className="border-b border-ink/5">
-                  <td className="py-3 pr-4 font-mono text-small">
-                    {fg} on {bg}
-                  </td>
-                  <td className="py-3 pr-4 text-ink/70">{context}</td>
-                  <td className="py-3 pr-4 tabular-nums">{ratio.toFixed(2)}:1</td>
-                  <td className="py-3 pr-4">
-                    <span
-                      className={
-                        level === "fail"
-                          ? "text-danger"
-                          : "text-navy-mid"
-                      }
-                    >
-                      {level}
-                    </span>
-                  </td>
-                  <td className="py-3">
-                    {/* text-h3's clamp floor is 24px — the WCAG large-text
-                        threshold — so this preview never renders at a size
-                        that would need the pair to clear the small-text
-                        4.5:1 bar it might not meet (see Task 4 for the
-                        explicit per-pair minimum-size guidance). */}
-                    <span
-                      className="inline-block rounded-sm px-4 py-2 text-h3"
-                      style={{ backgroundColor: COLORS[bg], color: COLORS[fg] }}
-                    >
-                      Aa
-                    </span>
-                  </td>
-                </tr>
+                <Fragment key={`${fg}-${bg}`}>
+                  <tr className="border-b border-ink/5">
+                    <td className="py-3 pr-4 font-mono text-small">
+                      {fg} on {bg}
+                    </td>
+                    <td className="py-3 pr-4 text-ink/70">{context}</td>
+                    <td className="py-3 pr-4 tabular-nums">{ratio.toFixed(2)}:1</td>
+                    <td className="py-3 pr-4">
+                      <ThresholdBadge pass={normalOk} />
+                    </td>
+                    <td className="py-3 pr-4">
+                      <ThresholdBadge pass={largeOk} />
+                    </td>
+                    <td className="py-3">
+                      {/* text-h3's clamp floor is 24px — the WCAG large-text
+                          threshold — so this preview never renders at a size
+                          that would need the pair to clear the small-text
+                          4.5:1 bar it might not meet. */}
+                      <span
+                        className="inline-block rounded-sm px-4 py-2 text-h3"
+                        style={{ backgroundColor: COLORS[bg], color: COLORS[fg] }}
+                      >
+                        Aa
+                      </span>
+                    </td>
+                  </tr>
+                  {(largeTextOnly || failsEverything) && (
+                    <tr>
+                      <td colSpan={6} className="pb-6">
+                        <p className="flex items-start gap-2 rounded-md border-2 border-danger bg-danger/10 px-4 py-3 text-body font-medium text-danger">
+                          <span aria-hidden="true">⚠</span>
+                          {failsEverything ? (
+                            <span>
+                              <strong>{fg} on {bg}</strong> fails contrast at every size
+                              ({ratio.toFixed(2)}:1, needs 3:1 minimum). Do not ship this pairing.
+                            </span>
+                          ) : (
+                            <span>
+                              <strong>{fg} on {bg}</strong> is {ratio.toFixed(2)}:1 — below the
+                              4.5:1 normal-text minimum. Large text only:{" "}
+                              <code>--text-h3</code> (24px) or larger, never for body copy,
+                              labels, or form text. See CLAUDE.md&rsquo;s Design hard rules.
+                            </span>
+                          )}
+                        </p>
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               );
             })}
           </tbody>
