@@ -13,17 +13,30 @@ export type Step = {
 type StickyStepsProps = {
   steps: Step[];
   className?: string;
+  /** Fires whenever the active step changes — e.g. for a progress indicator
+   * elsewhere on the page that needs to track along. */
+  onActiveIndexChangeAction?: (index: number) => void;
 };
 
 function StepPanel({ step, index, onEnter }: { step: Step; index: number; onEnter: (index: number) => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const isActive = useInView(ref, { margin: "-45% 0px -45% 0px" });
 
+  // Same latest-ref pattern as Preloader's onCompleteAction and
+  // ThemeSection's onThemeChangeAction: the current call site (setActiveIndex,
+  // a stable useState setter) doesn't need this, but any future consumer
+  // passing an inline arrow here would reproduce the exact infinite-loop bug
+  // STATUS.md records — that was fixed at the call site, not the primitive.
+  const onEnterRef = useRef(onEnter);
+  useEffect(() => {
+    onEnterRef.current = onEnter;
+  }, [onEnter]);
+
   useEffect(() => {
     if (isActive) {
-      onEnter(index);
+      onEnterRef.current(index);
     }
-  }, [isActive, index, onEnter]);
+  }, [isActive, index]);
 
   return (
     <div ref={ref} className="flex flex-col gap-3">
@@ -43,10 +56,22 @@ function StepPanel({ step, index, onEnter }: { step: Step; index: number; onEnte
  * plain stacked list under md: the sticky rail hides, and each panel shows
  * its own number/label inline instead.
  */
-export function StickySteps({ steps, className }: StickyStepsProps) {
+export function StickySteps({ steps, className, onActiveIndexChangeAction }: StickyStepsProps) {
   const reducedMotion = useMotionPreference();
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStep = steps[activeIndex];
+
+  // Same latest-ref guard as onEnter below and Preloader/ThemeSection's
+  // callback props — this is the public surface a consumer could pass an
+  // inline arrow into, so it needs the same protection.
+  const onActiveIndexChangeRef = useRef(onActiveIndexChangeAction);
+  useEffect(() => {
+    onActiveIndexChangeRef.current = onActiveIndexChangeAction;
+  }, [onActiveIndexChangeAction]);
+
+  useEffect(() => {
+    onActiveIndexChangeRef.current?.(activeIndex);
+  }, [activeIndex]);
 
   return (
     <div className={`grid gap-12 md:grid-cols-[1fr_2fr] md:gap-16 ${className ?? ""}`}>

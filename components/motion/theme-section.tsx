@@ -29,11 +29,21 @@ export function ThemeSection({ theme, children, className, onThemeChangeAction }
   const ref = useRef<HTMLElement>(null);
   const isActive = useInView(ref, { margin: "-50% 0px -50% 0px" });
 
+  // A consumer passing an inline arrow (e.g. Phase 2's Nav wiring straight
+  // into this prop) recreates that function every render. Reading it via a
+  // ref kept current by its own effect — same pattern as Preloader's
+  // onCompleteAction — means the firing effect's deps don't need the
+  // callback itself, so a fresh reference each render can't re-trigger it.
+  const onThemeChangeRef = useRef(onThemeChangeAction);
+  useEffect(() => {
+    onThemeChangeRef.current = onThemeChangeAction;
+  }, [onThemeChangeAction]);
+
   useEffect(() => {
     if (isActive) {
-      onThemeChangeAction?.(theme);
+      onThemeChangeRef.current?.(theme);
     }
-  }, [isActive, theme, onThemeChangeAction]);
+  }, [isActive, theme]);
 
   return (
     <section

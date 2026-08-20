@@ -38,6 +38,13 @@ export function PrimitivesSandbox() {
   const [motionSetting, setMotionSetting] = useState<MotionSetting>("system");
   const [preloaderKey, setPreloaderKey] = useState(0);
   const [activeTheme, setActiveTheme] = useState<"dark" | "light">("light");
+  // Stability proof for Task 3's guard: both callbacks below are fresh inline
+  // arrows every render (not useCallback), deliberately reproducing the shape
+  // that used to cause StickySteps' infinite render loop. If the counters
+  // stay small and settle rather than climbing unboundedly, the ref guard in
+  // the primitive is doing its job.
+  const [stickyStepsFireCount, setStickyStepsFireCount] = useState(0);
+  const [inlineThemeFireCount, setInlineThemeFireCount] = useState(0);
 
   const forceReducedMotion = motionSetting === "system" ? undefined : motionSetting === "reduced";
 
@@ -130,7 +137,15 @@ export function PrimitivesSandbox() {
         </Section>
 
         <Section title="StickySteps" description="Left rail pins the active step as you scroll the right column. Resize under md to see it collapse to a stacked list.">
-          <StickySteps steps={STEPS} />
+          <p className="mb-4 text-small text-ink/70">
+            Stability test — onActiveIndexChangeAction below is a fresh inline arrow every
+            render, not useCallback. Fired <strong>{stickyStepsFireCount}</strong> times; it
+            should settle small (one per step scrolled through), never climb unboundedly.
+          </p>
+          <StickySteps
+            steps={STEPS}
+            onActiveIndexChangeAction={() => setStickyStepsFireCount((c) => c + 1)}
+          />
         </Section>
 
         <Section title="RevealImage" description="clip-path wipe + slight scale-to-rest on the inner image, via next/image. Placeholder graphic — no real photography yet.">
@@ -149,6 +164,11 @@ export function PrimitivesSandbox() {
           <p className="mb-4 text-small text-ink/60">
             Active theme reported to parent: <strong>{activeTheme}</strong>
           </p>
+          <p className="text-small text-ink/70">
+            Stability test — the fourth section below passes a fresh inline arrow every render,
+            not useCallback. Fired <strong>{inlineThemeFireCount}</strong> times; it should
+            settle small (once per time this section becomes active), never climb unboundedly.
+          </p>
         </Section>
       </div>
 
@@ -163,6 +183,17 @@ export function PrimitivesSandbox() {
       <ThemeSection theme="light" onThemeChangeAction={setActiveTheme} className="px-gutter py-section">
         <p className="font-display text-d2">Light section again</p>
         <p className="mt-2 max-w-[60ch] text-lead">Transition back should take 600ms, not instant.</p>
+      </ThemeSection>
+      <ThemeSection
+        theme="dark"
+        onThemeChangeAction={() => setInlineThemeFireCount((c) => c + 1)}
+        className="px-gutter py-section"
+      >
+        <p className="font-display text-d2">Inline-arrow stability test</p>
+        <p className="mt-2 max-w-[60ch] text-lead">
+          onThemeChangeAction here is <code>() =&gt; setInlineThemeFireCount(...)</code>, defined
+          fresh in this JSX on every render — deliberately the shape that used to loop.
+        </p>
       </ThemeSection>
     </MotionPreferenceProvider>
   );
