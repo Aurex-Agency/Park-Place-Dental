@@ -63,7 +63,7 @@ const MOTION_TOKENS = [
 
 export default function TokensPage() {
   return (
-    <main className="mx-auto flex max-w-[--container-max] flex-col gap-16 px-gutter py-section">
+    <main className="mx-auto flex max-w-[var(--container-max)] flex-col gap-16 px-gutter py-section">
       <header>
         <h1 className="font-display text-d1 text-ink">Design tokens</h1>
         <p className="mt-2 text-lead text-ink/70">

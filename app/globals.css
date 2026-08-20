@@ -79,3 +79,52 @@ body {
   color: var(--color-ink);
   font-family: var(--font-body);
 }
+
+/*
+ * ---- Motion primitives: pure-CSS pieces ----
+ * Marquee and SwapButton are CSS-driven (WORKFLOW.md: don't burn JS on
+ * hover/marquee). Each primitive sets data-reduced-motion on its own root
+ * from useMotionPreference(), so this single attribute covers both the real
+ * OS setting and the /dev/primitives simulate toggle.
+ */
+
+/* ThemeSection — data-theme drives section bg/fg, primitive owns the transition */
+[data-theme="dark"] {
+  --section-bg: var(--color-navy);
+  --section-fg: var(--color-cream);
+}
+[data-theme="light"] {
+  --section-bg: var(--color-cream);
+  --section-fg: var(--color-ink);
+}
+.theme-section[data-reduced-motion="true"] {
+  transition-duration: 0ms !important;
+}
+
+/* Marquee */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee-scroll linear infinite;
+  animation-duration: var(--marquee-duration, 24s);
+}
+.marquee-track[data-direction="reverse"] {
+  animation-direction: reverse;
+}
+[data-marquee]:hover .marquee-track,
+[data-marquee]:focus-visible .marquee-track,
+[data-reduced-motion="true"] .marquee-track {
+  animation-play-state: paused;
+}
+
+/* SwapButton — data-reduced-motion is set on this element itself, not an ancestor */
+.swap-button-inner[data-reduced-motion="true"] {
+  transition: none !important;
+  transform: none !important;
+}
