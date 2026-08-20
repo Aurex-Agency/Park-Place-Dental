@@ -16,12 +16,11 @@ Read in this order:
 ## Repo state
 
 - Remote: `https://github.com/Aurex-Agency/Park-Place-Dental.git` (this is a **new** repo — a prior remote, `Park-Place-Dental-Boone.git`, was replaced; don't confuse the two)
-- `main`: seeded as a fresh orphan commit (no history from any prior attempt). Currently holds only `CLAUDE.md`, `DESIGN-SYSTEM.md`, `WORKFLOW.md`.
-- `phase-0-scaffold` (off `main`): Next.js scaffold + full design tokens. **PR #1, open, not merged.**
-- `phase-1-primitives` (off `phase-0-scaffold`): the nine motion primitives + sandbox. **PR #2, open, not merged.**
-- `chore/phase-1-cleanup` (off `phase-1-primitives`): quality gate, stale-doc, callback-guard, and contrast-enforcement fixes — see below. **PR #3, open, not merged.** This is the current/latest branch — if you're picking up work, branch from here (or from wherever PR #3 lands after merges catch up).
-- **Merge order matters**: PR #1 → `main`, then PR #2 → `main`, then PR #3 → `main` (rebasing each onto `main` as it lands, since they're stacked). None have been merged yet — merging needs a human (the harness blocks the agent from merging PRs itself by design).
-- KICKOFF-PROMPT.md itself is committed only on `phase-0-scaffold`/`phase-1-primitives`/`chore/phase-1-cleanup`, not yet on `main`.
+- `main`: seeded as a fresh orphan commit (no history from any prior attempt).
+- PRs #1, #2, and #3 (`phase-0-scaffold`, `phase-1-primitives`, `chore/phase-1-cleanup`) are all **merged** — but they were stacked (#2's base was #1's branch, #3's base was #2's branch), so merging each only landed it into its immediate parent branch, not `main`. Only PR #1 actually reached `main`. As of this writing **`main` still only has the Phase 0 scaffold — no `components/motion/`, no Phase 1, no cleanup fixes.**
+- **PR #4** (`chore/phase-1-cleanup` → `main`, opened after discovering the above): brings everything — Phase 0 + Phase 1 + the cleanup pass — into `main` in one merge. Confirmed cleanly mergeable, no conflicts. **Still open, not merged** — this is the one that actually matters now. Merge this one and `main` is caught up.
+- Once PR #4 merges, `main` is the branch to work from — the stacked branches (`phase-0-scaffold`, `phase-1-primitives`, `chore/phase-1-cleanup`) become historical and shouldn't be built on further.
+- KICKOFF-PROMPT.md itself is committed on the stacked branches, not yet on `main` (will be, once PR #4 merges).
 
 ## What's built
 
@@ -67,7 +66,7 @@ Four scoped fixes, no Phase 2 work:
 
 ## Outstanding / needs human action
 
-- **Merge PR #1, then PR #2, then PR #3** (or direct the next session to do it) — all three open, unmerged.
+- **Merge PR #4** (`chore/phase-1-cleanup` → `main`) — this is the one that actually lands everything in `main`. #1/#2/#3 are already merged but only reached each other's stacked branches, not `main` (see Repo state above).
 - **LCP budget miss** (found in the cleanup pass): 2700–3300ms against the 2000ms budget on all three routes, per `pnpm lhci`. Even plain-text LCP elements are this slow under simulated mobile throttling — worth a real performance investigation before Phase 2 adds more content/weight. Not investigated yet; deliberately out of scope for the gate-infrastructure cleanup task.
 - `CLEANUP-PROMPT.md` sits in the repo root as an untracked file (the prompt that drove this cleanup pass) — never committed anywhere. Not part of any task's scope. A human should decide whether it gets committed like `KICKOFF-PROMPT.md` was, or left local/deleted.
 - `TODO(kalob)` placeholders still open in `content/practice.ts`: hours, dentist credentials, service list, insurances, social links, form endpoint. Get these from the client directly, not from old mockups.
