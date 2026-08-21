@@ -37,7 +37,7 @@ async function assertAllTargetsAtLeast(container: Locator, label: string) {
   expect(undersized, `${label}: targets under ${MIN_TARGET_PX}x${MIN_TARGET_PX}px:\n${undersized.join("\n")}`).toEqual([]);
 }
 
-test.describe("desktop shell (>=1400px, full inline nav)", () => {
+test.describe("desktop shell (>=1120px, full inline nav)", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
   test("header targets are all >=44x44", async ({ page }) => {
@@ -51,7 +51,7 @@ test.describe("desktop shell (>=1400px, full inline nav)", () => {
   });
 });
 
-test.describe("mobile shell (<1400px, drawer nav)", () => {
+test.describe("mobile shell (<1120px, drawer nav)", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test("header (logo + trigger) targets are all >=44x44", async ({ page }) => {

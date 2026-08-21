@@ -222,6 +222,30 @@ PR #7 review caught that `min-[1400px]:` puts every 1366×768 laptop, every 1280
 
 Closing a 113px gap from here means one of: dropping the Emergency pill from the persistent desktop row again (contradicts Gate 1's explicit fix, which put it there specifically so it's reachable without opening any menu), dropping or shrinking the phone pill's treatment (in tension with "phone number never behind a menu"), shortening a nav link label (an IA/content call, not an engineering one), or reducing `SwapButton`'s base padding sitewide (a bigger, unrequested design change since every CTA on the site uses it). None of these were decided here — flagged for a human call, per instruction.
 
+### Gate 3 resolution — two layout levers instead of cutting Emergency/phone
+
+Two more levers landed the breakpoint at **1120px** without touching the Emergency pill or the phone pill's treatment, which were explicitly off the table:
+
+- **Nav gets its own gutter.** `--spacing-gutter` (`clamp(1.25rem, 5vw, 6rem)`) is ~51px/side at 1024px — ~102px of the 113px shortfall was gutter, not content. It's meant for body-prose breathing room, which chrome doesn't need, and the fix deliberately doesn't touch that shared token (body sections still want it). New fixed, non-responsive token instead: `--nav-gutter: 1.5rem` (24px), defined next to `--container-max`/`--nav-h` in `globals.css`. Nav no longer uses the shared `Container` component (which hardcodes `px-gutter`) — it has its own wrapper div now, since overriding a utility class via an appended `className` doesn't reliably win against a conflicting one already on the element (learned that the hard way earlier this project). Footer and future page content are untouched.
+- **Nav link horizontal padding trimmed.** `px-1` (8px/side) → `px-0.5` (4px/side) on `LINK_CLASS`. Height still carries the 44px target (`py-3` unchanged); `gap-1` (8px) between links was already at the floor asked for and didn't need to move.
+
+**Re-measured at all 6 requested widths** (Playwright `boundingBox()`, real layout, no calculation):
+
+| Width | Result |
+|---|---|
+| 1024px | overflow by 53.9px (down from 113.1px pre-lever) |
+| 1152px | fits, 24.0px margin |
+| 1280px | fits, 24.0px margin |
+| 1366px | fits, 24.0px margin |
+| 1440px | fits, 24.0px margin |
+| 1920px | fits, 264.0px margin (`Container`'s 1440px cap starts centering the excess) |
+
+The flat 24px margin from 1152–1440px is `--nav-gutter` itself — once content fits, `justify-between` puts the rightmost element flush against the gutter inset, at any width up to the container cap. That's not a coincidence to be suspicious of; it's the layout behaving exactly as designed.
+
+**Found the real threshold, not a rounded guess:** binary-searched between 1024 and 1152 — exactly 0.1px margin at 1078px (too fragile to ship on), stable at the full 24px gutter margin from **1120px** on. `min-[1120px]:` is that measured stability point, applied to `nav.tsx`, `mobile-bottom-bar.tsx`, and `shell.tsx`'s bottom-bar-clearance padding. Verified clean (no wrap, no overflow) from 320px to 1920px, with the hamburger-to-full-nav transition landing exactly at 1120px and nowhere else.
+
+**Where this leaves PLAN.md §3's targets:** hard requirement (full nav at 1280px and up) — met, with real margin. Stretch (1024px) — not met, short by 54px even after every lever available without cutting the Emergency pill, the phone pill, an IA label, or `SwapButton`'s shared padding. 1120px is a measured property of the current content, not a number chosen to look better than 1024 — if 1024px matters enough later, STATUS.md's per-element width table above still has what it would cost.
+
 ## Next: Phase 3 (per KICKOFF-PROMPT.md)
 
 Home page sections (13 sections, DESIGN-SYSTEM.md §4), built from the Phase 1 motion primitives inside the Phase 2 shell. STOP for review before Phase 4 (interior page content replacing today's stubs).

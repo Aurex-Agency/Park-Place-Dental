@@ -4,8 +4,9 @@ import { expect, test } from "@playwright/test";
  * Gate 2 (STATUS.md / CLAUDE.md rule #4): the drawer is the highest-risk a11y
  * component in the project, and its reduced-motion path must be tested, not
  * assumed. Forces a mobile-width viewport since the trigger only renders
- * below the `lg` breakpoint (playwright.config.ts's Desktop Chrome project
- * doesn't otherwise guarantee that).
+ * below Nav's custom min-[1120px] breakpoint (playwright.config.ts's Desktop
+ * Chrome project doesn't otherwise guarantee that — 390px is comfortably
+ * below it regardless of where the breakpoint itself ends up moving).
  */
 test.use({ viewport: { width: 390, height: 844 } });
 

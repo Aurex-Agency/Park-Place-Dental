@@ -82,6 +82,12 @@
 :root {
   --container-max: 1440px;
   --nav-h: 4.5rem;
+  /* Nav-only horizontal padding (Gate 3 correction, STATUS.md) — deliberately
+   * NOT --spacing-gutter: that token is for body-prose breathing room and
+   * scales up to 6rem, which alone was ~102px of a 113px shortfall at
+   * 1024px. Chrome doesn't need that; a fixed, modest value does. Body
+   * sections keep using --spacing-gutter unchanged. */
+  --nav-gutter: 1.5rem;
 }
 
 body {

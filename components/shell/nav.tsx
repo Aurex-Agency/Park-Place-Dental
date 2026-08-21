@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { SwapButton } from "@/components/motion";
 import { practice } from "@/content/practice";
-import { Container } from "./container";
 import { NAV_LINKS } from "./nav-links";
 import { useShellChrome } from "./shell-chrome";
 import { useScrolled } from "./use-scrolled";
@@ -16,9 +15,12 @@ const SOLIDIFY_PX = 24;
 // specifically for this audience, and Gate 3 found the nav using
 // text-small instead. inline-flex+items-center so padding actually
 // expands the clickable box (padding on a plain inline <a> is unreliable
-// for hit-testing across browsers).
+// for hit-testing across browsers). Horizontal padding trimmed to the
+// smallest step (rule #1 spacing scale) — height carries the 44px target,
+// not width; gap-1 (8px) between links is the real safeguard against
+// mis-taps, not padding on each one.
 const LINK_CLASS =
-  "shrink-0 whitespace-nowrap inline-flex items-center rounded-sm px-1 py-3 text-body outline-none focus-visible:ring-2 focus-visible:ring-focus";
+  "shrink-0 whitespace-nowrap inline-flex items-center rounded-sm px-0.5 py-3 text-body outline-none focus-visible:ring-2 focus-visible:ring-focus";
 
 /**
  * Solid by default (see TransparentHeroZone). Only floats transparent when
@@ -40,7 +42,13 @@ export function Nav() {
         isSolid ? "border-b border-ink/10 bg-cream/95 backdrop-blur" : "bg-transparent"
       }`}
     >
-      <Container className={`flex items-center justify-between gap-1 py-4 ${textClass}`}>
+      {/* Own wrapper, not the shared Container — Nav uses --nav-gutter
+          (fixed, modest) instead of Container's --spacing-gutter (scales to
+          6rem, meant for body-prose breathing room). Footer and page
+          content keep using Container/--spacing-gutter unchanged. */}
+      <div
+        className={`mx-auto flex max-w-[var(--container-max)] items-center justify-between gap-1 px-[var(--nav-gutter)] py-4 ${textClass}`}
+      >
         {/* text-lead, not text-h3 — the smaller display step recovers real
             width (was ~262px at text-h3) without inventing a new token
             (rule #1: tokens only). py-2.5 (up from py-2) keeps the 44px hit
@@ -52,7 +60,7 @@ export function Nav() {
           {practice.name}
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-1 min-[1400px]:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-1 min-[1120px]:flex">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className={LINK_CLASS}>
               {link.label}
@@ -60,7 +68,7 @@ export function Nav() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 min-[1400px]:flex">
+        <div className="hidden items-center gap-2 min-[1120px]:flex">
           {/* The phone number is the site's primary conversion (CLAUDE.md) —
               it read as the smallest, least prominent thing in the nav
               before Gate 3. Bordered pill + icon + bold text gives it real
@@ -110,7 +118,7 @@ export function Nav() {
           aria-expanded={drawerOpen}
           aria-controls="mobile-drawer"
           onClick={() => setDrawerOpen(true)}
-          className="rounded-sm p-2 outline-none focus-visible:ring-2 focus-visible:ring-focus min-[1400px]:hidden"
+          className="rounded-sm p-2 outline-none focus-visible:ring-2 focus-visible:ring-focus min-[1120px]:hidden"
         >
           <span className="sr-only">Open menu</span>
           <svg
@@ -126,7 +134,7 @@ export function Nav() {
             <path d="M4 7h16M4 12h16M4 17h16" />
           </svg>
         </button>
-      </Container>
+      </div>
     </header>
   );
 }
