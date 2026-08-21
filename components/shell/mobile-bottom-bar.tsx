@@ -9,7 +9,8 @@ import { trackEvent } from "@/lib/analytics";
  * switching to the full inline desktop layout (see nav.tsx), since below
  * that Nav only shows the drawer trigger and this bar is what carries the
  * phone/CTA. Shell.tsx pads page content so this never overlaps the last
- * element on a page.
+ * element on a page. (Tried lg — measured, doesn't fit even with Smile
+ * Gallery dropped from NAV_LINKS; see STATUS.md.)
  */
 export function MobileBottomBar() {
   return (
