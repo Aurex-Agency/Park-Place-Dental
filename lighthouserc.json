@@ -9,7 +9,7 @@
       "startServerCommand": "pnpm exec next start -p 4310",
       "startServerReadyPattern": "Ready in",
       "startServerReadyTimeout": 60000,
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "formFactor": "mobile",
         "throttlingMethod": "simulate"
