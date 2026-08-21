@@ -1,6 +1,6 @@
 # Project Status — Park Place Dental V2
 
-**Read this first.** This is the handoff doc for picking up this project cold. Last updated 2026-08-20, end of the Phase 1 cleanup pass (`chore/phase-1-cleanup`), mid-review.
+**Read this first.** This is the handoff doc for picking up this project cold. Last updated 2026-08-21, end of the post-cleanup performance investigation (`perf/lcp-investigation`). Phase 2 has not started.
 
 ## Orientation
 
@@ -58,6 +58,38 @@ Four scoped fixes, no Phase 2 work:
 3. **Callback-identity landmine guarded.** `ThemeSection.onThemeChangeAction` and `StickySteps`' internal `onEnter` called a consumer callback from an effect that listed the callback in its own deps — the exact shape that already caused one infinite-loop bug (fixed previously at the call site, not the primitive). Both now use the latest-ref pattern `Preloader` already used for `onCompleteAction`. `StickySteps` gained a small new public prop, `onActiveIndexChangeAction`, specifically so the fix is provable against an external consumer, not just asserted.
 4. **Rose-on-navy contrast limit made hard to violate.** Was prose-only in DESIGN-SYSTEM.md (4.4:1, large-text-only). `/dev/tokens` now shows explicit pass/fail badges against both AA thresholds (4.5:1 normal, 3:1 large) with an unmissable warning row for large-text-only pairs. Added CLAUDE.md hard rule #6 (rose/rose-lift never below `--text-h3`/24px, never for body/label/form text on navy) — **this renumbered every rule after it** (old 6–14 → new 7–15); references to old numbers in `tests/a11y.spec.ts` and `playwright.config.ts` were updated, rule #4 (reduced-motion) didn't move so its references elsewhere are untouched.
 
+## Performance investigation (`perf/lcp-investigation`)
+
+Triggered by the Phase 1 cleanup's LCP budget miss (above). Stopped deliberately at the placeholder-page ceiling — the rest is premature optimization against an LCP element (plain body text) that won't exist once Phase 3 builds a real hero. Findings:
+
+**The shell itself, not the tooling, is slow.** A bare-HTML control page (`public/perf-control.html`, since deleted) measured 651ms LCP under `simulate` — fast — which rules out "Lantern's simulated throttling model is broadly pessimistic" as an explanation. Every real route sits at 2.4–3.4s under the same throttling method, with **Render Delay consistently 80–85% of total LCP** across every route, both locally and deployed — not network transfer, not JS execution (TBT stayed 30–78ms throughout, uncorrelated with JS payload size), not the LCP element itself (always plain Inter Tight body text, never Fraunces, never an image, zero resource-load dependency: Load Delay and Load Time both measure 0ms everywhere). What in the shell drives that Render Delay is **not yet isolated** — see Phase 3 revisits below.
+
+**Deployed vs. localhost** (Lighthouse, `simulate`, n=3, against `park-place-dental-l7r16s4u6-...vercel.app`):
+
+| Route | Deployed median | Localhost median |
+|---|---|---|
+| `/` | 3376ms | 2709ms |
+| `/dev/tokens` | 3356ms | 2406ms |
+| `/dev/primitives` | 3334ms | 3006ms |
+
+Deployed is worse than local, not better — real TTFB (+~200ms from actual RTT/TLS/CDN) plus a further increase in Render Delay itself. The `provided`/167ms number seen early in the investigation was a zero-latency localhost artifact, not evidence of real speed.
+
+**Independent cross-check, PageSpeed Insights** (run directly against the deployed preview, not the API — no PSI/CrUX API key configured in this environment): **Performance 92/100, LCP 3.1s, FCP 1.5s, TBT 30ms, CLS 0.** PSI flags the LCP as "needs improvement" by its own rubric. This closely corroborates our own deployed `simulate` numbers (~3.3–3.4s) — an outside, independently-run instance sees the same magnitude of problem, which is the direct answer to "would a client running PSI on their own site see this": yes.
+
+**Fraunces compression, settled directly:** deployed transfer size 121,115B / resource size 120,800B vs. localhost 121,102B / 120,800B — effectively identical. Confirmed via response headers: no `content-encoding` on the font response in production. Fraunces is **not** brotli-compressed on the wire, and that's correct behavior, not a bug — WOFF2 is already a compressed binary format, so double-compressing it would cost CPU for no gain. It costs the same ~121KB in production as it does locally; there's no compression story here. Side finding, not chased further: Fraunces is still `<link rel=preload>`ed on every current route despite never being the LCP element on a placeholder page — worth revisiting once a real hero uses it (see below).
+
+**Budget decision:** `lighthouserc.json`'s `largest-contentful-paint` assertion raised from 2000ms → **2500ms**, `throttlingMethod` kept at `simulate`. 2000ms was set before anyone measured anything — an aspirational guess, not a floor. 2500ms is Google's own "good" LCP threshold: externally anchored, not backed into from our current number. The gate **still fails today** (measured ~3.1–3.4s) and that's intentional — it's meant to block entry to Phase 3, not block Phase 2 commits. CLAUDE.md rule #15 (`build && lint && test:a11y` before every commit) does **not** include `pnpm lhci` — that check is separate and is allowed to stay red through Phase 2.
+
+**One fix attempted, logged, not chased further:** `app/layout.tsx`'s Inter Tight (the LCP element's font, and the body font on every page) had `preload: false` — wrong regardless of which page renders it, since it's loaded on all of them. Changed to `preload: true`, redeployed, re-measured once: **3449ms**, no meaningful change from the pre-fix baseline (~3376ms, well within single-run variance). Render Delay stayed dominant (80%). Per the decision not to chase this further in Phase 2: logged as a non-fix, not pursued past one measurement. Fraunces was deliberately left as-is — whether it stays preloaded is a Phase 3 question, answerable only against a real hero.
+
+### Phase 3 performance revisits
+
+- **Font preload strategy against a real Fraunces hero.** Once Phase 3 builds the actual hero (likely `<h1>` in Fraunces), re-evaluate whether Fraunces preload is earning its ~121KB or should defer to Inter Tight the way it doesn't need to today.
+- **Hypothesis: Fraunces is contributing to Render Delay** despite not being the LCP element (rejected for testing in this investigation — it targets Fraunces when the LCP element has consistently been Inter Tight; revisit once real content makes Fraunces render-path-relevant).
+- **Hypothesis: placeholder-page architecture is itself distorting the measurement** (rejected for testing in this investigation — reasoning from a page Phase 3 will replace wholesale isn't reliable evidence; revisit against real Phase 3 markup).
+- **Hero video feasibility probe** (`/dev/hero-probe`, video vs. poster-only vs. static-scale LCP comparison, ~1.5MB placeholder video) — never built in this investigation; moves to Phase 3 where a real hero exists to test against, per CLAUDE.md rule #13's video budget.
+- The unresolved question from this investigation: what specifically in the shell drives 80–85% Render Delay on a page with zero resource-load dependency. Not isolated here — worth returning to if the Phase 3 hero doesn't resolve it on its own.
+
 ## Non-obvious project facts
 
 - **Dentist name**: "Dr. Ken Goodwin" is correct. "Kevin Goodwin" is an incorrect name circulating on the old live site and aggregator listings — never reproduce it anywhere, including internal docs.
@@ -67,7 +99,7 @@ Four scoped fixes, no Phase 2 work:
 ## Outstanding / needs human action
 
 - **Merge PR #4** (`chore/phase-1-cleanup` → `main`) — this is the one that actually lands everything in `main`. #1/#2/#3 are already merged but only reached each other's stacked branches, not `main` (see Repo state above).
-- **LCP budget miss** (found in the cleanup pass): 2700–3300ms against the 2000ms budget on all three routes, per `pnpm lhci`. Even plain-text LCP elements are this slow under simulated mobile throttling — worth a real performance investigation before Phase 2 adds more content/weight. Not investigated yet; deliberately out of scope for the gate-infrastructure cleanup task.
+- **LCP budget miss** (found in the cleanup pass): investigated on `perf/lcp-investigation` — see Performance investigation above. Budget reset to 2500ms (Google's "good" threshold) and the gate is intentionally left red through Phase 2; root cause (80–85% Render Delay on a page with no resource-load dependency) not fully isolated, logged as a Phase 3 revisit.
 - `CLEANUP-PROMPT.md` sits in the repo root as an untracked file (the prompt that drove this cleanup pass) — never committed anywhere. Not part of any task's scope. A human should decide whether it gets committed like `KICKOFF-PROMPT.md` was, or left local/deleted.
 - `TODO(kalob)` placeholders still open in `content/practice.ts`: hours, dentist credentials, service list, insurances, social links, form endpoint. Get these from the client directly, not from old mockups.
 - Real logo hex sampling hasn't happened — current navy/rose/cream values are a proposal, not sampled from brand assets.
