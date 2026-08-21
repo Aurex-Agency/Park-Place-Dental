@@ -42,7 +42,7 @@ Section 1 of DESIGN-SYSTEM.md breaks down exactly which of its ingredients we
 want and what each becomes for us. Section 3 defines the nine motion primitives.
 Build those primitives first and everything else composes from them.
 
-The brand direction is deep evergreen + warm ivory + brass — premium, warm,
+The brand direction is deep navy + warm cream + rose gold — premium, warm,
 adult. The explicit goal is that this looks nothing like the cyan-gradient,
 stock-photo-smile dental template. If it starts drifting that direction,
 stop and flag it.

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter_Tight } from "next/font/google";
 import { LenisProvider } from "@/components/providers/lenis-provider";
+import { MotionPreferenceProvider } from "@/components/motion/motion-preference";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -33,7 +34,9 @@ export default function RootLayout({
       className={`${fraunces.variable} ${interTight.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <LenisProvider>{children}</LenisProvider>
+        <MotionPreferenceProvider>
+          <LenisProvider>{children}</LenisProvider>
+        </MotionPreferenceProvider>
       </body>
     </html>
   );

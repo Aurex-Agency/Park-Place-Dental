@@ -74,12 +74,12 @@ Ambience, texture, and abstraction — the layer under the content:
 | Use | Prompt direction |
 |---|---|
 | Hero ambient loop | Slow light moving across a clean, warm, minimal interior. Shallow depth of field. No faces, no hands, no logos. 8–12s, seamless loop. |
-| Section transition textures | Soft evergreen-to-ivory gradient washes, subtle grain, out-of-focus bokeh |
+| Section transition textures | Soft navy-to-cream gradient washes with a whisper of rose-gold in the light falloff, subtle grain, out-of-focus bokeh |
 | Service card backgrounds | Abstract macro — water, light refraction, smooth ceramic-like surfaces |
-| Loading / empty states | Minimal looping motion in brand green |
+| Loading / empty states | Minimal looping shimmer in warm rose-gold — navy reads too heavy for something this brief |
 | Social cutdowns | 9:16 versions of the above for GBP posts and Instagram |
 
-Constraints to bake into every generation: brand palette only (evergreen / ivory / brass), no text, no faces, no hands, no recognizable dental equipment that isn't theirs, muted and calm rather than dramatic.
+Constraints to bake into every generation: brand palette only (navy / cream / rose gold), no text, no faces, no hands, no recognizable dental equipment that isn't theirs, muted and calm rather than dramatic.
 
 **Specs:** hero at 1920×1080, exported as **both** `.webm` (VP9) and `.mp4` (H.264) — Safari still needs the mp4. Target ≤ 1.5MB. Always generate a `poster` frame from frame 0. If you can't get under budget, use a static image with a slow CSS `scale` — nobody will miss the video, and LCP will thank you.
 
