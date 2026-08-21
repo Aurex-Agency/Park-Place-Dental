@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { practice } from "@/content/practice";
-import { TodoPlaceholder } from "@/components/ui/todo-placeholder";
 import { Container } from "./container";
 import { NAV_LINKS } from "./nav-links";
 
@@ -46,9 +45,18 @@ export function Footer() {
 
           <div>
             <p className="text-eyebrow uppercase tracking-eyebrow text-cream/60">Hours</p>
-            <TodoPlaceholder className="mt-2">{practice.hours}</TodoPlaceholder>
+            <p className="mt-2 text-body text-cream/80">{practice.hours}</p>
+
             <p className="mt-6 text-eyebrow uppercase tracking-eyebrow text-cream/60">Insurance</p>
-            <TodoPlaceholder className="mt-2">{practice.insurances}</TodoPlaceholder>
+            <p className="mt-2 text-body text-cream/80">
+              {practice.insurances.accepted.join(", ")}. Financing available through {practice.insurances.financing}.
+            </p>
+            {/* Real per-insurer network status isn't confirmed yet (see
+                content/practice.ts) — this caveat is honest without
+                asserting in-network status we haven't verified. */}
+            <p className="mt-2 text-small text-cream/60">
+              Call to confirm your plan is in-network before your visit.
+            </p>
           </div>
 
           <div>

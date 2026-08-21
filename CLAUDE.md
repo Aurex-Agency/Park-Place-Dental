@@ -64,13 +64,14 @@ DESIGN-SYSTEM.md
 8. **No PHI collection.** Forms take name, phone, email, preferred window, general reason dropdown. Every form includes the line: "Please don't include medical details here — we'll take those by phone." Never add a free-text "describe your symptoms" field.
 9. **No medical claims, guarantees, or superlatives** ("best dentist," "painless," "guaranteed results"). State-board advertising rules and FTC substantiation both apply.
 10. NAP (name, address, phone) is defined once in `content/practice.ts` and imported everywhere. It must match the Google Business Profile character-for-character.
-11. Real copy only. No lorem ipsum — it hides layout problems and gets shipped.
+11. **Dr. Ken Goodwin. Never Kevin.** The practice's own current site says "Kevin" on the home page and "Ken" on the dentist page — it contradicts itself. Ken is correct; never reproduce Kevin anywhere, including internal docs.
+12. Real copy only. No lorem ipsum — it hides layout problems and gets shipped.
 
 **Quality gates**
-12. WCAG 2.2 AA. Keyboard-complete, visible focus, semantic HTML, real `<button>`/`<a>`. Treat a11y failures as build failures.
-13. Budgets: LCP < 2.5s (`simulate` throttling — matches what PageSpeed Insights shows the client), CLS < 0.05, INP < 200ms on mid-tier Android / 4G. Hero video ≤ 1.5MB with a `poster`. If motion and budget conflict, budget wins. 2.5s is Google's own "good" LCP threshold, not a number we picked — see STATUS.md's performance investigation for how it was set and what it currently measures.
-14. Every page: unique `<title>` + meta description, OG image, canonical. Home + contact carry `Dentist` JSON-LD.
-15. `pnpm build && pnpm lint && pnpm test:a11y` must pass before any commit is proposed. `pnpm lhci` is checked separately, not part of this chain — it's allowed to fail during a phase (as it does through Phase 2, pending the Phase 3 revisits in STATUS.md) without blocking commits; it gates entry to Phase 3 launch prep, not day-to-day work.
+13. WCAG 2.2 AA. Keyboard-complete, visible focus, semantic HTML, real `<button>`/`<a>`. Treat a11y failures as build failures.
+14. Budgets: LCP < 2.5s (`simulate` throttling — matches what PageSpeed Insights shows the client), CLS < 0.05, INP < 200ms on mid-tier Android / 4G. Hero video ≤ 1.5MB with a `poster`. If motion and budget conflict, budget wins. 2.5s is Google's own "good" LCP threshold, not a number we picked — see STATUS.md's performance investigation for how it was set and what it currently measures.
+15. Every page: unique `<title>` + meta description, OG image, canonical. Home + contact carry `Dentist` JSON-LD.
+16. `pnpm build && pnpm lint && pnpm test:a11y` must pass before any commit is proposed. `pnpm lhci` is checked separately, not part of this chain — it's allowed to fail during a phase (as it does through Phase 2, pending the Phase 3 revisits in STATUS.md) without blocking commits; it gates entry to Phase 3 launch prep, not day-to-day work.
 
 ## Working style
 
