@@ -26,10 +26,10 @@ Deconstructed, so we can rebuild it deliberately instead of vibes-copying:
 
 ## 2. Brand direction
 
-Logo exists; palette and type are open. **Sample the logo first** and reconcile — everything below is the proposal, not the law.
+Palette resolved against the practice's real assets (PLAN.md §2, NEXT-STEPS.md §1) — this supersedes the rose-gold proposal below wherever the two conflict. The web logo is gold; the polo embroidery and the building's brick are a separate, redder hue used only for the emergency CTA. See STATUS.md's palette-and-content section for the full reasoning.
 
 ### The idea
-Deep navy reads as competent and calm without reading as cold or clinical — the opposite of a sterile white dental office. Warm cream keeps it from tipping into corporate/financial-institution territory, and a touch of rose gold gives it the warmth and specificity that a plain navy-and-white site lacks: **deep navy + warm cream + rose gold**. Confident, warm, adult. Zero resemblance to the cyan-gradient-and-stock-smile template every other dental site in Mississippi uses.
+Deep navy reads as competent and calm without reading as cold or clinical — the opposite of a sterile white dental office. Warm cream keeps it from tipping into corporate/financial-institution territory, and the practice's own gold gives it the warmth and specificity that a plain navy-and-white site lacks: **deep navy + warm cream + gold**, with brick red reserved entirely for emergency. Confident, warm, adult. Zero resemblance to the cyan-gradient-and-stock-smile template every other dental site in Mississippi uses.
 
 ### Color tokens
 
@@ -48,19 +48,22 @@ Deep navy reads as competent and calm without reading as cold or clinical — th
   --color-sand:       #EFE4D2;  /* alternating band */
   --color-white:      #FFFFFF;  /* cards only */
 
-  /* Accent — use sparingly, <5% of any viewport */
-  --color-rose:       #B8776A;
-  --color-rose-lift:  #C99184;
+  /* Brand accent — the practice's real logo gold. TODO(kalob): resample
+     from the logo file — read off a screenshot, not sampled from the art. */
+  --color-gold:       #A28D74;
+  --color-gold-lift:  #B09B82;
 
-  /* Feedback */
-  --color-danger:     #A33A2B;  /* emergency / urgent CTA only */
+  /* Emergency only — the building's brick, and the single place red
+     appears as a solid fill anywhere on the site. */
+  --color-brick:      #9B3A34;
+
   --color-focus:      #3E64A3;
 }
 ```
 
-**Ratios:** 60% cream/sand · 25% navy/ink · 10% navy-mid · 5% rose. Emergency-dental CTA is the only place `--color-danger` appears.
+**Ratios:** 60% cream/sand · 25% navy/ink · 10% navy-mid · 5% gold. Emergency CTAs are the only place `--color-brick` appears.
 
-**Contrast, non-negotiable:** every pairing below must clear WCAG AA (4.5:1 body, 3:1 large text). Verified pairs (computed, see `/dev/tokens`, which flags any pair under 4.5:1 with an explicit warning): `ink on cream` (16.9:1), `cream on navy` (14.1:1), `white on navy-mid` (8.2:1), `navy-lift on cream` (5.3:1). `rose`/`rose-lift` on `navy` is 4.4:1 — clears the 3:1 large-text minimum, fails the 4.5:1 normal-text minimum. This isn't just a note: CLAUDE.md's Design hard rules make it enforceable — `rose`/`rose-lift` text below `--text-h3` (24px), or any body copy/label/form text on `navy`, is not allowed, full stop.
+**Contrast, non-negotiable:** every pairing must clear WCAG AA (4.5:1 body, 3:1 large text) *except* gold on light surfaces, which is a fill/mark color there, never text (see below). Verified pairs (computed, see `/dev/tokens`, which flags any pair under its required minimum with an explicit warning): `ink on cream` (16.94:1), `cream on navy` (14.11:1), `ink on gold` (5.88:1, primary CTA fill), `gold on navy` (4.90:1, accent text on dark — clears normal-text AA), `white on brick` (6.89:1, emergency CTA text), `brick on cream` (6.23:1, emergency nav link text). `gold on cream` is 2.88:1 — fails even the 3:1 large-text minimum, worse on sand or white. This isn't just a note: CLAUDE.md's Design hard rules make it enforceable — `gold`/`gold-lift` are never used as text on `cream`, `sand`, or `white`, at any size, full stop. Gold on `navy` is the one place gold can be text.
 
 ### Typography
 
@@ -125,7 +128,7 @@ Grid: 12-col, `max-width: 1440px`, gutters `clamp(1.25rem, 5vw, 6rem)`. Radii: `
 | `<WordRotator>` | Cycles an array of words in the hero, 2.2s hold, y-slide swap. Pauses on `reduce`. |
 | `<Odometer>` | Digit columns roll to a target number when in view. `tabular-nums`. Supports prefix/suffix (`+`, `%`, `yrs`). |
 | `<Marquee>` | Seamless infinite ticker, CSS-only via duplicated track. `speed` and `direction` props. Pauses on hover. |
-| `<SwapButton>` | Two stacked copies of the label in an `overflow:hidden` box; on hover/focus both slide up one line-height. Focus-visible triggers it too. Variants: `primary` (navy-mid), `ghost` (outlined), `danger` (emergency). |
+| `<SwapButton>` | Two stacked copies of the label in an `overflow:hidden` box; on hover/focus both slide up one line-height. Focus-visible triggers it too. Variants: `primary` (gold fill, ink text), `ghost` (outlined), `danger` (brick fill, white text — emergency only). |
 | `<StickySteps>` | `position: sticky` numbered panels `01–04`. Left column pins the number + short label, right column scrolls the detail. Collapses to a plain stacked list under `md`. |
 | `<RevealImage>` | `clip-path: inset(100% 0 0 0) → inset(0)` with a slight `scale(1.08) → 1` on the inner img. |
 | `<ThemeSection>` | Wrapper that sets `data-theme="dark|light"` and transitions bg/text color over 600ms as it enters. Nav logo/link colors read the same attribute and invert. |
@@ -143,7 +146,7 @@ Optional, only if it earns its keep: a subtle magnetic hover on the primary CTA.
 3. **Trust strip** — `<Marquee>` of services, or a quiet row: years in Booneville · insurances accepted · same-day emergency
 4. **"Allowing you to focus on…" analogue** — one large calm statement + `KEEP SCROLLING` ticker
 5. **`<StickySteps>` — "Your first visit, start to finish" `01–04`**: Book in under a minute → What we do at your first exam → Your plan and what it costs, before we start → Ongoing care that fits your schedule. *This is the highest-converting section on the page. It kills the two real objections: "will it hurt" and "what will it cost."*
-6. **Services grid** — 6 cards with `<RevealImage>`: General & Preventive · Cosmetic · Restorative · Emergency · Children's · Implants & Whitening
+6. **Services grid** — 4 cards with `<RevealImage>`: General · Restorative · Cosmetic · Periodontal (real categories, `content/practice.ts`'s `services` — the old 6-card list here was invented, not sourced). Facial aesthetics (Botox, dermal fillers) deliberately isn't a home-grid card — it's an elective cosmetic line aimed at a different visitor than this page is built for, and next to the comfort-and-cost message it competes rather than reinforces. It gets its own page linked from `/services` instead (real revenue, wrong placement on the home page). Emergency folding into General is fine as taxonomy, but the home page still needs its own distinct emergency path — Phase 3 has to solve that with a section or a persistent element, not by relying on this grid to carry it.
 7. **`<Odometer>` stat band** on `navy` — years serving Prentiss County, patients cared for, average review rating, same-day emergency slots
 8. **Meet the team** — real photography, warm, `<RevealImage>` on hover
 9. **Reviews** — real Google reviews, name + first initial. Pull statically at build; do not embed a third-party widget (it will wreck LCP and leak trackers).
@@ -173,7 +176,7 @@ These are the ones that get skipped and then cost money:
 - **Phone number is the primary conversion**, not the form. Sticky `tel:` button on mobile, click-tracked.
 - **WCAG 2.2 AA is a legal exposure item**, not a nice-to-have. Healthcare sites are a standing ADA Title III target. Keyboard-complete, visible focus rings (`--color-focus`, 2px offset), real `<button>`/`<a>`, alt text on everything meaningful, no motion trap.
 - **`Dentist` schema.org JSON-LD** with exact NAP matching Google Business Profile character-for-character. `openingHoursSpecification`, `areaServed`, `hasMap`, `aggregateRating` only if genuinely sourced.
-- **Performance budget:** LCP < 2.5s and CLS < 0.05 on 4G/mid-tier Android (see CLAUDE.md rule #13 and STATUS.md's performance investigation for how 2.5s was set). Hero video ≤ 1.5MB, `poster` always set, `preload="none"` below the fold. If the preloader and the hero video together blow the budget, the video loses.
+- **Performance budget:** LCP < 2.5s and CLS < 0.05 on 4G/mid-tier Android (see CLAUDE.md rule #14 and STATUS.md's performance investigation for how 2.5s was set). Hero video ≤ 1.5MB, `poster` always set, `preload="none"` below the fold. If the preloader and the hero video together blow the budget, the video loses.
 - **No AI-generated people.** Ever. Not the dentist, not staff, not patients, not before/afters. That's a trust and (for before/afters) advertising-claims problem. AI is for texture and ambience only — see the workflow doc.
 
 ---

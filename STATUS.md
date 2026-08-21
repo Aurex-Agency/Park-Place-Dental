@@ -1,10 +1,10 @@
 # Project Status — Park Place Dental V2
 
-**Read this first.** This is the handoff doc for picking up this project cold. Last updated 2026-08-21, end of Phase 2 (`phase-2-shell`, not yet merged/PR'd as of this writing). Phase 3 has not started.
+**Read this first.** This is the handoff doc for picking up this project cold. Last updated 2026-08-21, end of the palette/content/shell-hardening pass (`chore/palette-content-shell`, not yet merged/PR'd as of this writing). Phase 3 has not started.
 
 ## Orientation
 
-This is a from-scratch rebuild of the Park Place Dental marketing site (general dental practice, Booneville, MS). It replaced an earlier, human-rejected creative direction (see `.claude` memory files if working from this machine — three prior rounds were rejected before this clean-slate restart). The current build follows `KICKOFF-PROMPT.md`'s phased script: **Phase 0 (scaffold), Phase 1 (motion primitives), the Phase 1 cleanup pass, the LCP performance investigation, and Phase 2 (nav shell/drawer/footer/mobile bottom bar) are all built**; Phase 3 (home page sections) has not started.
+This is a from-scratch rebuild of the Park Place Dental marketing site (general dental practice, Booneville, MS). It replaced an earlier, human-rejected creative direction (see `.claude` memory files if working from this machine — three prior rounds were rejected before this clean-slate restart). The current build follows `KICKOFF-PROMPT.md`'s phased script: **Phase 0 (scaffold), Phase 1 (motion primitives), the Phase 1 cleanup pass, the LCP performance investigation, and Phase 2 (nav shell/drawer/footer/mobile bottom bar) are all built** — plus an out-of-sequence pass (`chore/palette-content-shell`, PLAN.md/NEXT-STEPS.md) that corrected the palette to the practice's real gold/brick, filled `content/practice.ts` from a live-site audit, and hardened the Phase 2 shell (target sizes, a real hydration bug) before Phase 3 starts. Phase 3 (home page sections) has not started.
 
 Read in this order:
 1. `CLAUDE.md` — hard rules (design, compliance, quality gates). Overrides defaults.
@@ -78,7 +78,7 @@ Deployed is worse than local, not better — real TTFB (+~200ms from actual RTT/
 
 **Fraunces compression, settled directly:** deployed transfer size 121,115B / resource size 120,800B vs. localhost 121,102B / 120,800B — effectively identical. Confirmed via response headers: no `content-encoding` on the font response in production. Fraunces is **not** brotli-compressed on the wire, and that's correct behavior, not a bug — WOFF2 is already a compressed binary format, so double-compressing it would cost CPU for no gain. It costs the same ~121KB in production as it does locally; there's no compression story here. Side finding, not chased further: Fraunces is still `<link rel=preload>`ed on every current route despite never being the LCP element on a placeholder page — worth revisiting once a real hero uses it (see below).
 
-**Budget decision:** `lighthouserc.json`'s `largest-contentful-paint` assertion raised from 2000ms → **2500ms**, `throttlingMethod` kept at `simulate`. 2000ms was set before anyone measured anything — an aspirational guess, not a floor. 2500ms is Google's own "good" LCP threshold: externally anchored, not backed into from our current number. The gate **still fails today** (measured ~3.1–3.4s) and that's intentional — it's meant to block entry to Phase 3, not block Phase 2 commits. CLAUDE.md rule #15 (`build && lint && test:a11y` before every commit) does **not** include `pnpm lhci` — that check is separate and is allowed to stay red through Phase 2.
+**Budget decision:** `lighthouserc.json`'s `largest-contentful-paint` assertion raised from 2000ms → **2500ms**, `throttlingMethod` kept at `simulate`. 2000ms was set before anyone measured anything — an aspirational guess, not a floor. 2500ms is Google's own "good" LCP threshold: externally anchored, not backed into from our current number. The gate **still fails today** (measured ~3.1–3.4s) and that's intentional — it's meant to block entry to Phase 3, not block Phase 2 commits. CLAUDE.md rule #16 (`build && lint && test:a11y` before every commit) does **not** include `pnpm lhci` — that check is separate and is allowed to stay red through Phase 2.
 
 **One fix attempted, logged, not chased further:** `app/layout.tsx`'s Inter Tight (the LCP element's font, and the body font on every page) had `preload: false` — wrong regardless of which page renders it, since it's loaded on all of them. Changed to `preload: true`, redeployed, re-measured once: **3449ms**, no meaningful change from the pre-fix baseline (~3376ms, well within single-run variance). Render Delay stayed dominant (80%). Per the decision not to chase this further in Phase 2: logged as a non-fix, not pursued past one measurement. Fraunces was deliberately left as-is — whether it stays preloaded is a Phase 3 question, answerable only against a real hero.
 
@@ -87,7 +87,7 @@ Deployed is worse than local, not better — real TTFB (+~200ms from actual RTT/
 - **Font preload strategy against a real Fraunces hero.** Once Phase 3 builds the actual hero (likely `<h1>` in Fraunces), re-evaluate whether Fraunces preload is earning its ~121KB or should defer to Inter Tight the way it doesn't need to today.
 - **Hypothesis: Fraunces is contributing to Render Delay** despite not being the LCP element (rejected for testing in this investigation — it targets Fraunces when the LCP element has consistently been Inter Tight; revisit once real content makes Fraunces render-path-relevant).
 - **Hypothesis: placeholder-page architecture is itself distorting the measurement** (rejected for testing in this investigation — reasoning from a page Phase 3 will replace wholesale isn't reliable evidence; revisit against real Phase 3 markup).
-- **Hero video feasibility probe** (`/dev/hero-probe`, video vs. poster-only vs. static-scale LCP comparison, ~1.5MB placeholder video) — never built in this investigation; moves to Phase 3 where a real hero exists to test against, per CLAUDE.md rule #13's video budget.
+- **Hero video feasibility probe** (`/dev/hero-probe`, video vs. poster-only vs. static-scale LCP comparison, ~1.5MB placeholder video) — never built in this investigation; moves to Phase 3 where a real hero exists to test against, per CLAUDE.md rule #14's video budget.
 - The unresolved question from this investigation: what specifically in the shell drives 80–85% Render Delay on a page with zero resource-load dependency. Not isolated here — worth returning to if the Phase 3 hero doesn't resolve it on its own.
 
 ## Non-obvious project facts
@@ -100,10 +100,10 @@ Deployed is worse than local, not better — real TTFB (+~200ms from actual RTT/
 
 - **LCP budget miss** (found in the cleanup pass): investigated on `perf/lcp-investigation` (merged, PR #5) — see Performance investigation above. Budget reset to 2500ms (Google's "good" threshold) and the gate is intentionally left red through Phase 2; root cause (80–85% Render Delay on a page with no resource-load dependency) not fully isolated, logged as a Phase 3 revisit. Phase 2 measured a further real LCP regression on `/` from adding the nav shell — see Phase 2 section below, not yet chased either.
 - `CLEANUP-PROMPT.md` sits in the repo root as an untracked file (the prompt that drove this cleanup pass) — never committed anywhere. Not part of any task's scope. A human should decide whether it gets committed like `KICKOFF-PROMPT.md` was, or left local/deleted.
-- `TODO(kalob)` placeholders still open in `content/practice.ts`: hours, dentist credentials, service list, insurances, social links, form endpoint. Get these from the client directly, not from old mockups.
-- Real logo hex sampling hasn't happened — current navy/rose/cream values are a proposal, not sampled from brand assets.
-- No logo asset in the repo at all (`assets/brand/logo.jpg` was removed in the V2 reset) — Nav currently renders a text wordmark. Once a real logo exists, swapping it in is a Nav-only change.
-- No real photography yet — `/dev/primitives`' `RevealImage` demo uses an obvious placeholder SVG (`public/dev/placeholder.svg`), per CLAUDE.md's no-fake-photos rule.
+- `TODO(kalob)` placeholders still open in `content/practice.ts`: hours, dentist credentials, service list, and insurances are filled now (from PLAN.md's live-site audit, marked practice-stated-not-independently-verified in comments) — only **form endpoint**, **social links**, and **per-insurer in-network-vs-accepts-and-files status** are still genuinely open. Confirm the filled values with the office too (NEXT-STEPS.md §4/§5), especially current Friday hours and the insurance distinction.
+- Gold hex is a proposal read off a screenshot (`#A28D74`/`#B09B82`), not sampled from the actual logo artwork — NEXT-STEPS.md §1 has the real logo file identified in Drive and a resample procedure; hasn't been done. Marked `TODO(kalob)` directly on the token in `globals.css`.
+- No logo asset in the repo yet (`assets/brand/logo.jpg` was removed in the V2 reset) — Nav currently renders a text wordmark. NEXT-STEPS.md §1 identifies the real file in Drive; once it's extracted into `public/brand/`, swapping it in is a Nav-only change.
+- No real photography in the repo yet — `/dev/primitives`' `RevealImage` demo uses an obvious placeholder SVG (`public/dev/placeholder.svg`), per CLAUDE.md's no-fake-photos rule. NEXT-STEPS.md §2 has a ship-ready set identified from the practice's Drive; hasn't been extracted/prepped into `public/images/` yet.
 
 ## Phase 2 — nav shell, drawer, footer, mobile bottom bar (branch `phase-2-shell`)
 
@@ -139,7 +139,7 @@ Built per KICKOFF-PROMPT.md's Phase 2 script, gated in three stops (harness/desk
 - `TransparentHeroZone` used `useEffect`, which fires after the browser's first paint — since Nav and the hero live in different parts of the tree, this produced a real, visible flash of solid-then-transparent nav on every load of a page with a hero. Switched to `useLayoutEffect`, which runs before paint, eliminating the post-hydration flash.
 
 **Found, reported, deliberately not fixed this phase:**
-- The `useLayoutEffect` fix above only closes the *post-hydration* flash. `/dev/shell` (the only route using `TransparentHeroZone` right now) still shows solid nav in the raw server-rendered HTML for the brief window before client JS hydrates — an inherent SSR-to-hydration gap, not something a layout effect can retroactively fix, since effects can't run before hydration starts. Solving it fully would mean making hero-transparency a server-known, per-route value instead of client-effect-driven, which isn't worth designing against a throwaway harness page — Phase 3's real hero will have concrete requirements (actual height, actual content) worth designing that against. Logged here so it isn't rediscovered as a surprise.
+- The `useLayoutEffect` fix above only closes the *post-hydration* flash. `/dev/shell` (the only route using `TransparentHeroZone` right now) still shows solid nav in the raw server-rendered HTML for the brief window before client JS hydrates — an inherent SSR-to-hydration gap, not something a layout effect can retroactively fix, since effects can't run before hydration starts. Solving it fully would mean making hero-transparency a server-known, per-route value instead of client-effect-driven, which isn't worth designing against a throwaway harness page — Phase 3's real hero will have concrete requirements (actual height, actual content) worth designing that against. Logged here so it isn't rediscovered as a surprise. **Correction (Gate 3, `chore/palette-content-shell`): this visual flash was, at the time, conflated with a real console hydration error (React #418) that showed up around the same work. They were unrelated — the error's actual cause was `MobileDrawer` branching on `typeof document === "undefined"`, fixed below. The visual SSR-to-hydration gap described in this bullet is still real and still not fixed, on purpose, for the reason stated above.**
 - Footer's address is formatted from the verified street/city/state/zip components in `content/practice.ts`, but the exact concatenated string hasn't been checked character-for-character against the live Google Business Profile listing (CLAUDE.md rule #10). The components are verified; the display formatting isn't.
 - Mobile bottom bar follows best practice for the on-screen-keyboard-overlap concern (`position: fixed`, no viewport-height layout tricks that break under keyboard resize), but there's no real form to test against yet — that's Phase 4/5. Don't treat this as verified on a physical device.
 
@@ -153,7 +153,98 @@ Built per KICKOFF-PROMPT.md's Phase 2 script, gated in three stops (harness/desk
 | `/dev/tokens` (control) | LCP | 2707ms | 2708ms |
 | `/dev/primitives` (control) | LCP | 3158ms | 3161ms |
 
-TBT and CLS are fine — TBT actually improved, CLS stayed at 0 despite adding two `position: fixed` elements (nav, bottom bar). **LCP on `/` got meaningfully worse (+447ms)**, and the controls (structurally untouched by this phase, still outside `(marketing)/`) barely moved, which rules out measurement noise as the explanation — the nav shell is the cause. The added cost lands entirely in Render Delay (86% of LCP now vs. the low-80s% before), the same unexplained phase the perf investigation already flagged and deferred to Phase 3. Not chased further here — reported per the explicit instruction not to make things worse silently, and left as evidence for whoever picks up that Phase 3 revisit.
+TBT and CLS are fine — TBT actually improved, CLS stayed at 0 despite adding two `position: fixed` elements (nav, bottom bar). **LCP on `/` got meaningfully worse (+447ms)**, and the controls (structurally untouched by this phase, still outside `(marketing)/`) barely moved, which rules out measurement noise as the explanation — the nav shell is the cause. The added cost lands entirely in Render Delay (86% of LCP now vs. the low-80s% before), the same unexplained phase the perf investigation already flagged and deferred to Phase 3. Not chased further here — reported per the explicit instruction not to make things worse silently, and left as evidence for whoever picks up that Phase 3 revisit. Not chased in Gate 3 either, per explicit instruction — same reasoning, same deferral.
+
+## Gate 3 — target sizes and a real hydration fix (branch `chore/palette-content-shell`)
+
+axe (the tool `pnpm test:a11y` runs) checks color contrast and a long list of other WCAG rules, but **not** target size (SC 2.5.8) — Phase 2's shell shipped 23px nav links and 26px footer links straight through a green run. Gate 3 closed that gap directly instead of continuing to trust axe for something it doesn't check.
+
+**Bar used: 44×44px, not WCAG's 24×24 minimum.** CLAUDE.md/PLAN.md's audience (35–65 year olds) is the reason, not the legal floor. Padding does the work everywhere, not font-size or line-height — text stays at its designed size (`text-body`/`text-lead`), hit areas grow via `py-*`/`px-*` on `inline-flex items-center` wrappers.
+
+**Measured heights, after** (Playwright bounding boxes, not axe — axe doesn't check this):
+
+| Element | Desktop (≥1400px) | Mobile (<1400px) |
+|---|---|---|
+| Logo | 80px | 68px |
+| Nav links (About/Services/New Patients/Contact) | 74px | — (in drawer instead) |
+| Phone pill | 68px | — (in drawer instead) |
+| Emergency pill | 66px | — (in drawer instead) |
+| Primary CTA (`SwapButton`) | 68px | 68px (in drawer) |
+| Hamburger trigger / drawer close button | — | 56px / 56px |
+| Drawer nav rows | — | 75px, 8px gaps between rows |
+| Drawer phone pill | — | 69px |
+| Footer phone / directions / nav links | 66px / 63px / 66px | same (footer doesn't change by viewport) |
+| Mobile bottom bar (Call / Request an Appointment) | — | 90px |
+
+All ≥44px. Reporting this, not asserting it's fixed — the actual assertion lives in the new `tests/target-size.spec.ts`, wired into `pnpm test:a11y`: 6 cases covering desktop header/footer and mobile header/footer/drawer/bottom-bar, each walking every `a[href]`/`button:not([disabled])` in its container and failing with the specific undersized element(s) named if anything is under 44×44. The skip link is deliberately excluded — it's `sr-only` until keyboard-focused, so it has no meaningful pointer-target box in its default state, and forcing a hidden element to 44×44 wouldn't test anything real.
+
+**The width problem this reopened.** Growing every nav element to a real hit area blew Phase 2/Gate 1's carefully-fitted desktop nav width — measured (not calculated) overflow of 149px at 1280px right after the sizing changes landed. Padding can't shrink below what 44px needs and font-size is explicitly off the table, so the only real levers left were tighter gaps (`gap-1`/8px throughout, down from `gap-2`–`gap-4`) and trimming horizontal-only padding on the phone/Emergency pills (`px-4`→`px-3`, doesn't touch the 44px height). That recovered about 90px but still wasn't enough — measured the real fit threshold empirically rather than guessing again: 1350px still only had ~9px margin (too fragile), 1400px had 57px. Landed on a custom `min-[1400px]:` breakpoint rather than jumping to the `2xl`/1536px default, which would have pushed the common 1366–1536px laptop range into hamburger mode for no reason. Verified clean (no wrap, no overflow, real margin) from 1400px to 1920px, and a clean hamburger-to-full-nav transition with no broken in-between state from 320px up to 1399px.
+
+**Phone number's visual weight.** Was the smallest, least-styled thing in the nav — a plain underlined text link — despite being the site's primary conversion (CLAUDE.md). Now a bordered pill with a phone icon and bold text, sized on par with the CTAs either side of it. Desktop uses `border-current` so it reads correctly in both Nav's transparent (cream text over a dark hero) and solid (ink text) states, the same mechanism the rest of the header's text color already uses; the drawer version uses a fixed `border-ink` since that panel is always cream/ink regardless of scroll state. Same treatment applied to the drawer's version and, since "every interactive element in the shell" reads Footer in too, Footer's phone/directions/nav links as well — none of those three were named explicitly in the gate but all were well under 44px.
+
+**The hydration error — corrected diagnosis.** Previously logged (above) as an SSR-to-hydration timing gap tied to the nav-color flash. That diagnosis was wrong: the real cause was unrelated to the hero/nav-color work entirely. `MobileDrawer` branched on `if (typeof document === "undefined") return null` to skip its `createPortal` call during SSR (`document` doesn't exist in Node). That check evaluates `false` immediately in the browser, including on the client's very first, pre-hydration render — so the client's first render already disagreed with the server's, and React's hydration diffing flagged exactly that (console error, React #418, reproduced and confirmed before the fix). Fixed by replacing the branch with a `useMounted()` hook (`components/shell/use-mounted.ts`) built on `useSyncExternalStore` — same pattern `use-scrolled.ts` and `motion/motion-preference.tsx` already use for this exact server/client split, returning `false` via `getServerSnapshot` and `true` client-side, so the server and the client's first render agree and only a later, client-only render swaps in the real portal content. (A first attempt used plain `useState(false)` + a mount `useEffect` — functionally correct, but tripped `eslint-plugin-react-hooks`'s `set-state-in-effect` rule; `useSyncExternalStore` avoids that entirely and matches existing code, so it's what shipped.) Confirmed clean via the browser console on both `next dev` and a real production build after a hard reload — zero errors, was reproducibly present before the fix.
+
+**Bugs found and fixed along the way:**
+- Footer's nav/phone/directions links were 23–26px tall — never explicitly named in the gate ("every interactive element in the shell" caught them), same padding-driven fix as everything else.
+- Nav's logo link was 36px tall on mobile — same fix.
+
+The Phase 2 LCP regression wasn't touched this gate either, per explicit instruction — still deferred to Phase 3.
+
+### Gate 3 correction — breakpoint still isn't at PLAN.md §3's 1024px target
+
+PR #7 review caught that `min-[1400px]:` puts every 1366×768 laptop, every 1280px window, and any non-maximized browser on a 1440 display into the hamburger — directly contradicting PLAN.md §3 ("no hamburger above 1024px"), which exists specifically because a hamburger-hidden nav was the client's own stated complaint about their current site. The breakpoint had moved `lg`(1024px) → `xl`(1280px) → `1400px` across three gates, each time by raising the threshold instead of reducing what has to fit — called out directly as the wrong pattern, and rightly so.
+
+**Two real content cuts made in response, not spacing tricks:**
+- CTA label: "Request an Appointment" → "Request a Visit" everywhere (nav, drawer, bottom bar, the `/dev/primitives` demo, and the `trackEvent` name it fires). "Request," not "Book" — `practice.bookingDisclaimer` exists specifically because the form produces a callback, not a confirmed appointment; "Book" would contradict that. Natural width dropped from 281px to 207px.
+- Logo: `font-display text-h3` → `font-display text-lead` — the next step down in the existing type scale, not a new token (rule #1). 262px → 182px at full size. Padding went from `py-2` to `py-2.5` specifically to hold the 44px hit area even though the text itself shrank.
+
+**Re-measured empirically at all 5 requested widths, not calculated** (Playwright `boundingBox()`, `/dev/shell`, `simulate`-free real layout):
+
+| Width | Result |
+|---|---|
+| 1024px | **overflow by 113.1px** |
+| 1280px | fits, 64.0px margin |
+| 1366px | fits, 68.3px margin |
+| 1440px | fits, 72.0px margin |
+| 1920px | fits, 336.0px margin |
+
+1024px genuinely doesn't work yet, even after both cuts. Per instruction, the breakpoint was **not** raised again to paper over that — reverted to the same `min-[1400px]:` the PR already had (the last known-working, already-open-for-review state) as a neutral holding position while this gets decided, not a new unilateral answer.
+
+**Real per-element widths at full size** (unconstrained, 1920px viewport), for whoever decides what else comes out:
+
+| Element | Width |
+|---|---|
+| Nav links (About/Services/New Patients/Contact) combined | ~326px |
+| Phone pill | 195px |
+| CTA button | 207px |
+| Emergency pill | 137px |
+| Logo | 182px |
+
+Closing a 113px gap from here means one of: dropping the Emergency pill from the persistent desktop row again (contradicts Gate 1's explicit fix, which put it there specifically so it's reachable without opening any menu), dropping or shrinking the phone pill's treatment (in tension with "phone number never behind a menu"), shortening a nav link label (an IA/content call, not an engineering one), or reducing `SwapButton`'s base padding sitewide (a bigger, unrequested design change since every CTA on the site uses it). None of these were decided here — flagged for a human call, per instruction.
+
+### Gate 3 resolution — two layout levers instead of cutting Emergency/phone
+
+Two more levers landed the breakpoint at **1120px** without touching the Emergency pill or the phone pill's treatment, which were explicitly off the table:
+
+- **Nav gets its own gutter.** `--spacing-gutter` (`clamp(1.25rem, 5vw, 6rem)`) is ~51px/side at 1024px — ~102px of the 113px shortfall was gutter, not content. It's meant for body-prose breathing room, which chrome doesn't need, and the fix deliberately doesn't touch that shared token (body sections still want it). New fixed, non-responsive token instead: `--nav-gutter: 1.5rem` (24px), defined next to `--container-max`/`--nav-h` in `globals.css`. Nav no longer uses the shared `Container` component (which hardcodes `px-gutter`) — it has its own wrapper div now, since overriding a utility class via an appended `className` doesn't reliably win against a conflicting one already on the element (learned that the hard way earlier this project). Footer and future page content are untouched.
+- **Nav link horizontal padding trimmed.** `px-1` (8px/side) → `px-0.5` (4px/side) on `LINK_CLASS`. Height still carries the 44px target (`py-3` unchanged); `gap-1` (8px) between links was already at the floor asked for and didn't need to move.
+
+**Re-measured at all 6 requested widths** (Playwright `boundingBox()`, real layout, no calculation):
+
+| Width | Result |
+|---|---|
+| 1024px | overflow by 53.9px (down from 113.1px pre-lever) |
+| 1152px | fits, 24.0px margin |
+| 1280px | fits, 24.0px margin |
+| 1366px | fits, 24.0px margin |
+| 1440px | fits, 24.0px margin |
+| 1920px | fits, 264.0px margin (`Container`'s 1440px cap starts centering the excess) |
+
+The flat 24px margin from 1152–1440px is `--nav-gutter` itself — once content fits, `justify-between` puts the rightmost element flush against the gutter inset, at any width up to the container cap. That's not a coincidence to be suspicious of; it's the layout behaving exactly as designed.
+
+**Found the real threshold, not a rounded guess:** binary-searched between 1024 and 1152 — exactly 0.1px margin at 1078px (too fragile to ship on), stable at the full 24px gutter margin from **1120px** on. `min-[1120px]:` is that measured stability point, applied to `nav.tsx`, `mobile-bottom-bar.tsx`, and `shell.tsx`'s bottom-bar-clearance padding. Verified clean (no wrap, no overflow) from 320px to 1920px, with the hamburger-to-full-nav transition landing exactly at 1120px and nowhere else.
+
+**Where this leaves PLAN.md §3's targets:** hard requirement (full nav at 1280px and up) — met, with real margin. Stretch (1024px) — not met, short by 54px even after every lever available without cutting the Emergency pill, the phone pill, an IA label, or `SwapButton`'s shared padding. 1120px is a measured property of the current content, not a number chosen to look better than 1024 — if 1024px matters enough later, STATUS.md's per-element width table above still has what it would cost.
 
 ## Next: Phase 3 (per KICKOFF-PROMPT.md)
 

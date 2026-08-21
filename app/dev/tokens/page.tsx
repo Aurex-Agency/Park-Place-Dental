@@ -16,17 +16,20 @@ const COLORS = {
   cream: "#f8f3ea",
   sand: "#efe4d2",
   white: "#ffffff",
-  rose: "#b8776a",
-  "rose-lift": "#c99184",
-  danger: "#a33a2b",
+  gold: "#a28d74",
+  "gold-lift": "#b09b82",
+  brick: "#9b3a34",
   focus: "#3e64a3",
 } as const;
 
 const VERIFIED_PAIRS: Array<{ fg: keyof typeof COLORS; bg: keyof typeof COLORS; context: string }> = [
   { fg: "ink", bg: "cream", context: "body text" },
   { fg: "cream", bg: "navy", context: "dark section text" },
-  { fg: "white", bg: "navy-mid", context: "primary button text" },
-  { fg: "rose", bg: "navy", context: "accent on dark" },
+  { fg: "ink", bg: "gold", context: "primary CTA fill" },
+  { fg: "gold", bg: "navy", context: "accent text on dark" },
+  { fg: "gold", bg: "cream", context: "why gold text is banned on light surfaces" },
+  { fg: "white", bg: "brick", context: "emergency CTA text" },
+  { fg: "brick", bg: "cream", context: "emergency nav link text" },
 ];
 
 const TYPE_SCALE = [
@@ -62,13 +65,17 @@ const MOTION_TOKENS = [
   { token: "--stagger", value: "60ms", use: "stagger delay" },
 ] as const;
 
+// The fail state deliberately doesn't use brick — brick is emergency-CTA-only
+// (CLAUDE.md rule #6) and this is unrelated UI chrome, not the brand's
+// emergency signal. A bold ink treatment (heavier weight, not just color)
+// also means this doesn't rely on color alone to convey state.
 function ThresholdBadge({ pass }: { pass: boolean }) {
   return (
     <span
       className={
         pass
           ? "inline-flex items-center gap-1 rounded-pill bg-navy-mid/10 px-2 py-1 text-small font-medium text-navy-mid"
-          : "inline-flex items-center gap-1 rounded-pill bg-danger/10 px-2 py-1 text-small font-medium text-danger"
+          : "inline-flex items-center gap-1 rounded-pill border-2 border-ink bg-ink/10 px-2 py-1 text-small font-bold text-ink"
       }
     >
       {pass ? "✓ pass" : "✗ fail"}
@@ -144,21 +151,30 @@ export default function TokensPage() {
                     </td>
                     <td className="py-3">
                       {/* text-h3's clamp floor is 24px — the WCAG large-text
-                          threshold — so this preview never renders at a size
-                          that would need the pair to clear the small-text
-                          4.5:1 bar it might not meet. */}
-                      <span
-                        className="inline-block rounded-sm px-4 py-2 text-h3"
-                        style={{ backgroundColor: COLORS[bg], color: COLORS[fg] }}
-                      >
-                        Aa
-                      </span>
+                          threshold — so a shown preview never renders at a
+                          size that would need the pair to clear the small-
+                          text 4.5:1 bar it might not meet. A pair that fails
+                          even the 3:1 large-text minimum genuinely can't be
+                          previewed live — aria-hidden doesn't exempt visible
+                          text from contrast rules (it only affects screen
+                          readers; a sighted low-vision user would still see
+                          illegible text), so don't render it as text at all. */}
+                      {failsEverything ? (
+                        <span className="text-small italic text-ink/60">not previewable — illegible</span>
+                      ) : (
+                        <span
+                          className="inline-block rounded-sm px-4 py-2 text-h3"
+                          style={{ backgroundColor: COLORS[bg], color: COLORS[fg] }}
+                        >
+                          Aa
+                        </span>
+                      )}
                     </td>
                   </tr>
                   {(largeTextOnly || failsEverything) && (
                     <tr>
                       <td colSpan={6} className="pb-6">
-                        <p className="flex items-start gap-2 rounded-md border-2 border-danger bg-danger/10 px-4 py-3 text-body font-medium text-danger">
+                        <p className="flex items-start gap-2 rounded-md border-2 border-ink bg-ink/10 px-4 py-3 text-body font-medium text-ink">
                           <span aria-hidden="true">⚠</span>
                           {failsEverything ? (
                             <span>

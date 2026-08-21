@@ -4,7 +4,7 @@ const PORT = 4310;
 const baseURL = `http://localhost:${PORT}`;
 
 /**
- * Runs the a11y suite against a real production build (CLAUDE.md rule #15
+ * Runs the a11y suite against a real production build (CLAUDE.md rule #16
  * chains `pnpm build` before `pnpm test:a11y`, so `.next/` already exists —
  * this starts that build, not a dev server with fast-refresh overhead/dead
  * code).

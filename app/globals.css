@@ -21,10 +21,17 @@
   --color-sand: #efe4d2;
   --color-white: #ffffff;
 
-  --color-rose: #b8776a;
-  --color-rose-lift: #c99184;
+  /* Brand accent — the practice's real logo gold, per PLAN.md §2 / NEXT-STEPS.md §1.
+     TODO(kalob): resample gold from the logo file — these values were read
+     off a screenshot, not sampled from the artwork. */
+  --color-gold: #a28d74;
+  --color-gold-lift: #b09b82;
 
-  --color-danger: #a33a2b;
+  /* Emergency only. The single place red appears as a solid fill —
+     replaces the old --color-danger, which was nearly identical to this
+     and collided with it rather than being a separate token. */
+  --color-brick: #9b3a34;
+
   --color-focus: #3e64a3;
 
   /* ---- Fonts — §2 ---- */
@@ -75,6 +82,12 @@
 :root {
   --container-max: 1440px;
   --nav-h: 4.5rem;
+  /* Nav-only horizontal padding (Gate 3 correction, STATUS.md) — deliberately
+   * NOT --spacing-gutter: that token is for body-prose breathing room and
+   * scales up to 6rem, which alone was ~102px of a 113px shortfall at
+   * 1024px. Chrome doesn't need that; a fixed, modest value does. Body
+   * sections keep using --spacing-gutter unchanged. */
+  --nav-gutter: 1.5rem;
 }
 
 body {

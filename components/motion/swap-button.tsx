@@ -15,10 +15,17 @@ type SwapButtonProps =
   | (SwapButtonOwnProps & { href: string } & Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className" | "children">)
   | (SwapButtonOwnProps & { href?: undefined } & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className" | "children">);
 
+// primary: gold fill + ink text, per PLAN.md §2 — 5.88:1, comfortably clears
+// AA. Gold is a fill/mark color, never a text color on cream/sand/white (see
+// CLAUDE.md rule #6) — this is the one place that matters for a button, since
+// the fill itself carries the color and the text sits on top of it, not on
+// the page background.
+// danger: brick red, emergency-only — the one place red appears as a solid
+// fill on the site (CLAUDE.md rule #6).
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: "bg-navy-mid text-white hover:bg-navy-lift focus-visible:bg-navy-lift",
+  primary: "bg-gold text-ink hover:bg-gold-lift focus-visible:bg-gold-lift",
   ghost: "border border-ink/20 text-ink hover:border-navy focus-visible:border-navy",
-  danger: "bg-danger text-white hover:bg-danger/90 focus-visible:bg-danger/90",
+  danger: "bg-brick text-white hover:bg-brick/90 focus-visible:bg-brick/90",
 };
 
 /**
