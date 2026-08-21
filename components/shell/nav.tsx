@@ -11,8 +11,14 @@ import { useScrolled } from "./use-scrolled";
 /** How far past the top the page has to scroll before a transparent nav solidifies. */
 const SOLIDIFY_PX = 24;
 
+// text-body (17px, not text-small) and real padding, not line-height, get
+// the hit area to 44px — DESIGN-SYSTEM.md sets --text-body to 17px
+// specifically for this audience, and Gate 3 found the nav using
+// text-small instead. inline-flex+items-center so padding actually
+// expands the clickable box (padding on a plain inline <a> is unreliable
+// for hit-testing across browsers).
 const LINK_CLASS =
-  "shrink-0 whitespace-nowrap rounded-sm text-small outline-none focus-visible:ring-2 focus-visible:ring-focus";
+  "shrink-0 whitespace-nowrap inline-flex items-center rounded-sm px-1 py-3 text-body outline-none focus-visible:ring-2 focus-visible:ring-focus";
 
 /**
  * Solid by default (see TransparentHeroZone). Only floats transparent when
@@ -34,12 +40,15 @@ export function Nav() {
         isSolid ? "border-b border-ink/10 bg-cream/95 backdrop-blur" : "bg-transparent"
       }`}
     >
-      <Container className={`flex items-center justify-between gap-2 py-4 ${textClass}`}>
-        <Link href="/" className="shrink-0 whitespace-nowrap rounded-sm font-display text-h3 outline-none focus-visible:ring-2 focus-visible:ring-focus">
+      <Container className={`flex items-center justify-between gap-1 py-4 ${textClass}`}>
+        <Link
+          href="/"
+          className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm py-2 font-display text-h3 outline-none focus-visible:ring-2 focus-visible:ring-focus"
+        >
           {practice.name}
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-2 xl:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-1 min-[1400px]:flex">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className={LINK_CLASS}>
               {link.label}
@@ -47,11 +56,32 @@ export function Nav() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 xl:flex">
+        <div className="hidden items-center gap-2 min-[1400px]:flex">
+          {/* The phone number is the site's primary conversion (CLAUDE.md) —
+              it read as the smallest, least prominent thing in the nav
+              before Gate 3. Bordered pill + icon + bold text gives it real
+              visual weight, on par with the CTAs either side of it, not a
+              plain underlined utility link. border-current so it reads
+              correctly in both Nav's transparent (cream text on dark hero)
+              and solid (ink text) states — same mechanism as the rest of
+              the header's text color. */}
           <a
             href={practice.nap.phoneHref}
-            className={`${LINK_CLASS} font-medium underline-offset-4 hover:underline`}
+            className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-pill border border-current/30 px-3 py-2.5 text-body font-semibold outline-none hover:border-current/60 focus-visible:ring-2 focus-visible:ring-focus"
           >
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11 11 0 0 0 3.5.56 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11 11 0 0 0 .56 3.5 1 1 0 0 1-.25 1z" />
+            </svg>
             {practice.nap.phone}
           </a>
           {/* Filled brick pill, not a text link: brick text fails badly on
@@ -61,7 +91,7 @@ export function Nav() {
               fix for Phase 2 dropping this from the desktop row entirely. */}
           <a
             href="/emergency-dentist"
-            className="inline-flex shrink-0 items-center whitespace-nowrap rounded-pill bg-brick px-2 py-1 text-small font-bold text-white outline-none hover:bg-brick/90 focus-visible:ring-2 focus-visible:ring-focus"
+            className="inline-flex shrink-0 items-center whitespace-nowrap rounded-pill bg-brick px-3 py-2.5 text-body font-bold text-white outline-none hover:bg-brick/90 focus-visible:ring-2 focus-visible:ring-focus"
           >
             Emergency
           </a>
@@ -76,7 +106,7 @@ export function Nav() {
           aria-expanded={drawerOpen}
           aria-controls="mobile-drawer"
           onClick={() => setDrawerOpen(true)}
-          className="rounded-sm p-2 outline-none focus-visible:ring-2 focus-visible:ring-focus xl:hidden"
+          className="rounded-sm p-2 outline-none focus-visible:ring-2 focus-visible:ring-focus min-[1400px]:hidden"
         >
           <span className="sr-only">Open menu</span>
           <svg

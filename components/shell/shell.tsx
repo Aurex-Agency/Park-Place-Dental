@@ -17,7 +17,7 @@ function ShellBody({ children }: { children: ReactNode }) {
     // everything in it, including Nav's own trigger — drops out of the tab
     // order and the a11y tree (the drawer, portaled separately, is the one
     // thing left interactive).
-    <div data-shell-content inert={drawerOpen || undefined} className="pb-[4.5rem] xl:pb-0">
+    <div data-shell-content inert={drawerOpen || undefined} className="pb-[4.5rem] min-[1400px]:pb-0">
       <Nav />
       <main id="main-content" tabIndex={-1} className={heroTransparent ? "" : "pt-[var(--nav-h)]"}>
         {children}

@@ -3,8 +3,11 @@ import { practice } from "@/content/practice";
 import { Container } from "./container";
 import { NAV_LINKS } from "./nav-links";
 
+// Gate 3 (STATUS.md): "every interactive element in the shell" means this
+// too, not just Nav/drawer — flex+items-center+py so padding (not text
+// size) gets the hit area to 44px, same pattern as nav.tsx's LINK_CLASS.
 const LINK_CLASS =
-  "rounded-sm text-body text-cream/80 outline-none underline-offset-4 hover:text-cream hover:underline focus-visible:ring-2 focus-visible:ring-focus";
+  "flex items-center rounded-sm py-2.5 text-body text-cream/80 outline-none underline-offset-4 hover:text-cream hover:underline focus-visible:ring-2 focus-visible:ring-focus";
 
 // CLAUDE.md rule #10: must match the Google Business Profile character-for-
 // character. The components below (street/city/state/zip) are verified —
@@ -29,7 +32,7 @@ export function Footer() {
             </address>
             <a
               href={practice.nap.phoneHref}
-              className="mt-3 block rounded-sm text-body font-medium text-cream outline-none underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+              className="mt-1 flex items-center rounded-sm py-2.5 text-body font-medium text-cream outline-none underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-focus"
             >
               {practice.nap.phone}
             </a>
@@ -37,7 +40,7 @@ export function Footer() {
               href={MAPS_HREF}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 block rounded-sm text-small text-cream/70 outline-none underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+              className="flex items-center rounded-sm py-2.5 text-small text-cream/70 outline-none underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-focus"
             >
               Get directions
             </a>
@@ -62,7 +65,7 @@ export function Footer() {
           <div>
             <p className="text-eyebrow uppercase tracking-eyebrow text-cream/60">Serving</p>
             <p className="mt-2 text-body text-cream/80">{practice.serviceAreaTowns.join(" · ")}</p>
-            <nav aria-label="Footer" className="mt-6 flex flex-col gap-2">
+            <nav aria-label="Footer" className="mt-4 flex flex-col gap-1">
               {NAV_LINKS.map((link) => (
                 <Link key={link.href} href={link.href} className={LINK_CLASS}>
                   {link.label}

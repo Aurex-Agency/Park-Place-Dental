@@ -5,17 +5,20 @@ import { practice } from "@/content/practice";
 import { trackEvent } from "@/lib/analytics";
 
 /**
- * Persistent below the xl breakpoint — matches Nav's own breakpoint for
- * switching to the full inline desktop layout (see nav.tsx), since below
- * that Nav only shows the drawer trigger and this bar is what carries the
- * phone/CTA. Shell.tsx pads page content so this never overlaps the last
- * element on a page. (Tried lg — measured, doesn't fit even with Smile
- * Gallery dropped from NAV_LINKS; see STATUS.md.)
+ * Persistent below Nav's own breakpoint for switching to the full inline
+ * desktop layout (see nav.tsx), since below that Nav only shows the drawer
+ * trigger and this bar is what carries the phone/CTA. Shell.tsx pads page
+ * content so this never overlaps the last element on a page. (Tried lg —
+ * measured, doesn't fit even with Smile Gallery dropped from NAV_LINKS.
+ * Tried xl — Gate 3's 44px touch targets grew the nav enough that xl
+ * stopped fitting too; landed on a custom 1400px breakpoint rather than
+ * jumping to 2xl/1536px, which would push the common 1366-1536px laptop
+ * range into hamburger mode for no reason. See STATUS.md.)
  */
 export function MobileBottomBar() {
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink/10 bg-cream/95 backdrop-blur xl:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink/10 bg-cream/95 backdrop-blur min-[1400px]:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <a
