@@ -32,3 +32,5 @@ pnpm-debug.log*
 # TypeScript / Next.js build artifacts
 *.tsbuildinfo
 next-env.d.ts
+.vercel
+.env*
