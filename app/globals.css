@@ -69,9 +69,12 @@
   --stagger: 60ms;
 }
 
-/* Page max-width, referenced by the shell/container component (Phase 2) */
+/* Shell layout constants (Phase 2) — not @theme tokens since they don't need
+ * to generate Tailwind utilities beyond what arbitrary-value var() already
+ * gives them (max-w-[var(--container-max)], pt-[var(--nav-h)]). */
 :root {
   --container-max: 1440px;
+  --nav-h: 4.5rem;
 }
 
 body {
@@ -127,4 +130,41 @@ body {
 .swap-button-inner[data-reduced-motion="true"] {
   transition: none !important;
   transform: none !important;
+}
+
+/*
+ * Mobile drawer (Phase 2). Plain CSS transition, not a Motion primitive —
+ * this is shell chrome, not a home-page section. data-open/data-reduced-
+ * motion live on the portal root; backdrop/panel are its children, so these
+ * ARE legitimately descendant selectors (unlike the ThemeSection bug where
+ * the attribute and the class it targeted were on the same element).
+ */
+.mobile-drawer-root {
+  visibility: hidden;
+  transition: visibility 0s linear var(--dur-base);
+}
+.mobile-drawer-root[data-open="true"] {
+  visibility: visible;
+  transition-delay: 0s;
+}
+.mobile-drawer-backdrop {
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out-expo);
+}
+.mobile-drawer-panel {
+  transform: translateX(100%);
+  transition: transform var(--dur-base) var(--ease-out-expo);
+}
+[data-open="true"] .mobile-drawer-backdrop {
+  opacity: 1;
+}
+[data-open="true"] .mobile-drawer-panel {
+  transform: translateX(0);
+}
+[data-reduced-motion="true"].mobile-drawer-root {
+  transition-duration: 0ms !important;
+}
+[data-reduced-motion="true"] .mobile-drawer-backdrop,
+[data-reduced-motion="true"] .mobile-drawer-panel {
+  transition-duration: 0ms !important;
 }

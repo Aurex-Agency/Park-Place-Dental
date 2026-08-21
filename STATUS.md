@@ -1,16 +1,16 @@
 # Project Status — Park Place Dental V2
 
-**Read this first.** This is the handoff doc for picking up this project cold. Last updated 2026-08-21, end of the post-cleanup performance investigation (`perf/lcp-investigation`). Phase 2 has not started.
+**Read this first.** This is the handoff doc for picking up this project cold. Last updated 2026-08-21, end of Phase 2 (`phase-2-shell`, not yet merged/PR'd as of this writing). Phase 3 has not started.
 
 ## Orientation
 
-This is a from-scratch rebuild of the Park Place Dental marketing site (general dental practice, Booneville, MS). It replaced an earlier, human-rejected creative direction (see `.claude` memory files if working from this machine — three prior rounds were rejected before this clean-slate restart). The current build follows `KICKOFF-PROMPT.md`'s phased script: **Phase 0 (scaffold) and Phase 1 (motion primitives) are built, and a cleanup pass on Phase 1 is done**; Phase 2 (nav shell) has not started.
+This is a from-scratch rebuild of the Park Place Dental marketing site (general dental practice, Booneville, MS). It replaced an earlier, human-rejected creative direction (see `.claude` memory files if working from this machine — three prior rounds were rejected before this clean-slate restart). The current build follows `KICKOFF-PROMPT.md`'s phased script: **Phase 0 (scaffold), Phase 1 (motion primitives), the Phase 1 cleanup pass, the LCP performance investigation, and Phase 2 (nav shell/drawer/footer/mobile bottom bar) are all built**; Phase 3 (home page sections) has not started.
 
 Read in this order:
 1. `CLAUDE.md` — hard rules (design, compliance, quality gates). Overrides defaults.
 2. `DESIGN-SYSTEM.md` — source of truth for color/type/spacing/motion tokens and page architecture. **Note: its color section was rewritten mid-Phase-0** — see Palette below.
 3. `WORKFLOW.md` — how code/motion/assets/copy/SEO tracks fit together.
-4. `KICKOFF-PROMPT.md` — the actual phased build script being executed. Phase 0/1 are done; resume at Phase 2.
+4. `KICKOFF-PROMPT.md` — the actual phased build script being executed. Phase 0/1/2 are done; resume at Phase 3.
 5. This file, for what's actually true right now vs. what those docs describe in the abstract.
 
 ## Repo state
@@ -98,13 +98,63 @@ Deployed is worse than local, not better — real TTFB (+~200ms from actual RTT/
 
 ## Outstanding / needs human action
 
-- **Merge PR #4** (`chore/phase-1-cleanup` → `main`) — this is the one that actually lands everything in `main`. #1/#2/#3 are already merged but only reached each other's stacked branches, not `main` (see Repo state above).
-- **LCP budget miss** (found in the cleanup pass): investigated on `perf/lcp-investigation` — see Performance investigation above. Budget reset to 2500ms (Google's "good" threshold) and the gate is intentionally left red through Phase 2; root cause (80–85% Render Delay on a page with no resource-load dependency) not fully isolated, logged as a Phase 3 revisit.
+- **LCP budget miss** (found in the cleanup pass): investigated on `perf/lcp-investigation` (merged, PR #5) — see Performance investigation above. Budget reset to 2500ms (Google's "good" threshold) and the gate is intentionally left red through Phase 2; root cause (80–85% Render Delay on a page with no resource-load dependency) not fully isolated, logged as a Phase 3 revisit. Phase 2 measured a further real LCP regression on `/` from adding the nav shell — see Phase 2 section below, not yet chased either.
 - `CLEANUP-PROMPT.md` sits in the repo root as an untracked file (the prompt that drove this cleanup pass) — never committed anywhere. Not part of any task's scope. A human should decide whether it gets committed like `KICKOFF-PROMPT.md` was, or left local/deleted.
 - `TODO(kalob)` placeholders still open in `content/practice.ts`: hours, dentist credentials, service list, insurances, social links, form endpoint. Get these from the client directly, not from old mockups.
 - Real logo hex sampling hasn't happened — current navy/rose/cream values are a proposal, not sampled from brand assets.
+- No logo asset in the repo at all (`assets/brand/logo.jpg` was removed in the V2 reset) — Nav currently renders a text wordmark. Once a real logo exists, swapping it in is a Nav-only change.
 - No real photography yet — `/dev/primitives`' `RevealImage` demo uses an obvious placeholder SVG (`public/dev/placeholder.svg`), per CLAUDE.md's no-fake-photos rule.
 
-## Next: Phase 2 (per KICKOFF-PROMPT.md)
+## Phase 2 — nav shell, drawer, footer, mobile bottom bar (branch `phase-2-shell`)
 
-Nav (transparent over hero, solidifies on scroll, inverts via `ThemeSection`'s `data-theme`), mobile drawer, footer, and a persistent mobile bottom bar with "Call" and "Book" (phone is the primary conversion, not the form). Then STOP for review before Phase 3 (home page sections).
+Built per KICKOFF-PROMPT.md's Phase 2 script, gated in three stops (harness/desktop nav, mobile drawer, footer/bottom bar). All in `components/shell/`, composed by `components/shell/shell.tsx` and used by both `app/(marketing)/layout.tsx` (real routes) and `app/dev/shell` (the review harness — the actual Shell component, not a reimplementation).
+
+**Architecture note for Phase 3:** the hero doesn't exist yet, but Nav's "transparent over hero, solidifies on scroll" contract does — `TransparentHeroZone` (`components/shell/transparent-hero-zone.tsx`) is the opt-in a page wraps its hero in; `ShellChromeProvider` (`components/shell/shell-chrome.tsx`) is the context coordinating Nav, the drawer, and page content, since they don't share a parent/child relationship. Nav is solid by default; interior pages (all six stubs, today's `/`) never opt in. `ThemeSection` still doesn't know Nav exists — pages wire its `onThemeChangeAction` straight to `setActiveTheme` from `useShellChrome()`.
+
+**Gate 1 — harness, stubs, desktop nav:**
+- `/dev/shell` — dummy full-viewport dark hero (`TransparentHeroZone` + `ThemeSection`) plus three alternating scroll sections, enough to exercise transparent→solid, color inversion while transparent, and staying solid once solidified regardless of what scrolls by underneath.
+- Six stub routes, all added to `tests/routes.ts`: `/about`, `/services`, `/new-patients`, `/smile-gallery`, `/contact`, `/emergency-dentist`. Contact and Emergency Dentist stubs go further than a bare placeholder — they surface the phone number and (Contact) `practice.bookingDisclaimer` directly, since a visitor hitting either mid-build should still be able to act.
+- Desktop nav: logo (text wordmark — no logo asset exists, see Outstanding), 5 links, phone as a plain `tel:` link, `Request an Appointment` CTA via `SwapButton`.
+- Skip link is the first element in the DOM on every marketing page, before Nav.
+
+**Gate 2 — mobile drawer** (`components/shell/mobile-drawer.tsx`), verified against every item on the required list:
+- Portals to `document.body` via `createPortal` — has to be structurally outside the `inert` wrapper Shell puts around the rest of the page while it's open.
+- Focus moves to the close button on open, returns to the trigger on close (both verified by element identity, not just attribute presence).
+- Tab/Shift+Tab trapped inside the panel via a manual `keydown` handler walking the panel's own focusable elements; Escape closes.
+- `aria-expanded` on the trigger, `aria-controls="mobile-drawer"` pointing at the dialog panel specifically (not the portal's backdrop+panel wrapper).
+- Background (Nav, main, footer, bottom bar — everything except the drawer itself) is `inert` while open, verified on the actual element it's set on (`[data-shell-content]`), not a descendant — inert doesn't propagate as a JS property to children, only the behavior does.
+- Scroll lock compensates for scrollbar-width via measured `padding-right`, no layout shift.
+- CSS-only slide/fade (not a Motion primitive — this is chrome, not a section), gated by the same `data-reduced-motion` pattern as the rest of the primitives; closed state uses a delayed `visibility: hidden` (not just off-screen transform) so it's genuinely non-interactive and non-visible while closed, not just visually elsewhere.
+
+*How I verified it* (the ask was to actually do this and report, not assert it): real keyboard-driven navigation against a running production build — Tab from page load lands on the skip link, then the logo, then the hamburger trigger (`aria-controls="mobile-drawer"` confirms it); Enter opens the drawer and focus lands on "Close menu"; Tab eight times walks About → Services → New Patients → Smile Gallery → Contact → phone → Emergency Dentist → Request an Appointment, staying inside the dialog the whole way; Shift+Tab from the close button wraps to the last item (Request an Appointment), confirming the trap cycles both directions; Escape closes it and returns focus to the trigger button by strict element-identity check; background content's `inert` property reads `true` for the whole time the drawer is open. Repeated under `prefers-reduced-motion: reduce` with the same results. Automated as `tests/mobile-drawer.spec.ts` (10 cases × normal/reduced-motion), run green twice in a row to rule out flake, consistent with this project's existing testing standard.
+
+**Gate 3 — footer and mobile bottom bar:**
+- Footer (`components/shell/footer.tsx`): NAP from `content/practice.ts` only, hours and insurance rendered via a new `TodoPlaceholder` component (`components/ui/todo-placeholder.tsx`) — visibly unfinished (dashed border, obviously a placeholder), not invented. Service area towns, a Google Maps search link built from the verified address components, secondary nav.
+- Mobile bottom bar (`components/shell/mobile-bottom-bar.tsx`): persistent "Call" / "Request an Appointment", both wired to a new `lib/analytics.ts` `trackEvent()` seam — logs to console in dev, no-ops otherwise, ready for Phase 5 to point at a real provider.
+- Content clearance: Shell's content wrapper carries bottom padding matched to the bar's breakpoint so the bar never covers a page's last element.
+
+**Bugs found and fixed during Gate 1 review** (same "build it, then break it against a real viewport" process as Phase 1):
+- `SwapButton` (a Phase 1 primitive) had no `shrink-0`/`whitespace-nowrap` protection. Its two-line-stack slide mechanic requires exactly one line of text; squeezed into Nav's flex row, "Emergency Dentist" and "Request an Appointment" wrapped and the `h-[1.2em] overflow-hidden` label wrapper silently clipped the second line to nothing. Fixed in the primitive itself (not patched at the call site) since any flex context could trigger it.
+- Nav's desktop content (logo + 5 links + phone + 2 CTAs) didn't actually fit `Container`'s 1440px max-width at any realistic viewport — measured the true single-line requirement at ~1443px, i.e. wider than the container itself. Fixed by: dropping the "Emergency Dentist" pill from the persistent desktop row (Gate 1 only asked for logo/links/CTA/phone — it stays reachable via the drawer, footer, and its own stub page), tightening nav link/gap sizing, and moving the full-desktop-nav breakpoint from `lg` (1024px) to `xl` (1280px) so the drawer (already fully verified) covers the gap instead of a half-broken squeeze. Verified via Playwright at 320–1920px: header height stays constant (no wrap) at every width, hamburger shows cleanly below 1280px with no in-between broken state.
+- `TransparentHeroZone` used `useEffect`, which fires after the browser's first paint — since Nav and the hero live in different parts of the tree, this produced a real, visible flash of solid-then-transparent nav on every load of a page with a hero. Switched to `useLayoutEffect`, which runs before paint, eliminating the post-hydration flash.
+
+**Found, reported, deliberately not fixed this phase:**
+- The `useLayoutEffect` fix above only closes the *post-hydration* flash. `/dev/shell` (the only route using `TransparentHeroZone` right now) still shows solid nav in the raw server-rendered HTML for the brief window before client JS hydrates — an inherent SSR-to-hydration gap, not something a layout effect can retroactively fix, since effects can't run before hydration starts. Solving it fully would mean making hero-transparency a server-known, per-route value instead of client-effect-driven, which isn't worth designing against a throwaway harness page — Phase 3's real hero will have concrete requirements (actual height, actual content) worth designing that against. Logged here so it isn't rediscovered as a surprise.
+- Footer's address is formatted from the verified street/city/state/zip components in `content/practice.ts`, but the exact concatenated string hasn't been checked character-for-character against the live Google Business Profile listing (CLAUDE.md rule #10). The components are verified; the display formatting isn't.
+- Mobile bottom bar follows best practice for the on-screen-keyboard-overlap concern (`position: fixed`, no viewport-height layout tricks that break under keyboard resize), but there's no real form to test against yet — that's Phase 4/5. Don't treat this as verified on a physical device.
+
+**lhci, before vs. after this phase** (`simulate` throttling, n=3, localhost — `/dev/tokens` and `/dev/primitives` don't render the new shell at all and are included as a control):
+
+| Route | Metric | Before (main, PR #5) | After (this phase) |
+|---|---|---|---|
+| `/` | LCP | 2710ms | **3157ms** |
+| `/` | TBT | 69ms | 42ms |
+| `/` | CLS | 0 | 0 |
+| `/dev/tokens` (control) | LCP | 2707ms | 2708ms |
+| `/dev/primitives` (control) | LCP | 3158ms | 3161ms |
+
+TBT and CLS are fine — TBT actually improved, CLS stayed at 0 despite adding two `position: fixed` elements (nav, bottom bar). **LCP on `/` got meaningfully worse (+447ms)**, and the controls (structurally untouched by this phase, still outside `(marketing)/`) barely moved, which rules out measurement noise as the explanation — the nav shell is the cause. The added cost lands entirely in Render Delay (86% of LCP now vs. the low-80s% before), the same unexplained phase the perf investigation already flagged and deferred to Phase 3. Not chased further here — reported per the explicit instruction not to make things worse silently, and left as evidence for whoever picks up that Phase 3 revisit.
+
+## Next: Phase 3 (per KICKOFF-PROMPT.md)
+
+Home page sections (13 sections, DESIGN-SYSTEM.md §4), built from the Phase 1 motion primitives inside the Phase 2 shell. STOP for review before Phase 4 (interior page content replacing today's stubs).

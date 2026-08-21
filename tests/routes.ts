@@ -15,6 +15,13 @@ export type RouteEntry = {
 
 export const routes: RouteEntry[] = [
   { path: "/" },
+  { path: "/about" },
+  { path: "/services" },
+  { path: "/new-patients" },
+  { path: "/smile-gallery" },
+  { path: "/contact" },
+  { path: "/emergency-dentist" },
   { path: "/dev/tokens", devOnly: true },
   { path: "/dev/primitives", devOnly: true },
+  { path: "/dev/shell", devOnly: true },
 ];

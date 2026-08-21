@@ -31,7 +31,13 @@ const VARIANT_CLASSES: Record<Variant, string> = {
 export function SwapButton({ children, variant = "primary", className, href, ...rest }: SwapButtonProps) {
   const reducedMotion = useMotionPreference();
 
-  const sharedClassName = `group relative inline-flex items-center justify-center overflow-hidden rounded-pill px-6 py-3 text-body font-medium outline-none transition-colors duration-[var(--dur-fast)] focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 ${VARIANT_CLASSES[variant]} ${className ?? ""}`;
+  // shrink-0 + whitespace-nowrap: the two-line-stack slide only works with
+  // exactly one line of text, so in any flex context that would otherwise
+  // compress this below its content width (e.g. a crowded nav row), the
+  // label must never wrap or shrink — found via Phase 2's Nav, where a
+  // squeezed flex row wrapped "Emergency Dentist" and the h-[1.2em]
+  // overflow-hidden wrapper silently clipped the second line.
+  const sharedClassName = `group relative inline-flex shrink-0 items-center justify-center overflow-hidden whitespace-nowrap rounded-pill px-6 py-3 text-body font-medium outline-none transition-colors duration-[var(--dur-fast)] focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 ${VARIANT_CLASSES[variant]} ${className ?? ""}`;
 
   const inner = (
     <span className="relative block h-[1.2em] overflow-hidden">

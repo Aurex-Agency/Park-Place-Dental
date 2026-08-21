@@ -173,7 +173,7 @@ These are the ones that get skipped and then cost money:
 - **Phone number is the primary conversion**, not the form. Sticky `tel:` button on mobile, click-tracked.
 - **WCAG 2.2 AA is a legal exposure item**, not a nice-to-have. Healthcare sites are a standing ADA Title III target. Keyboard-complete, visible focus rings (`--color-focus`, 2px offset), real `<button>`/`<a>`, alt text on everything meaningful, no motion trap.
 - **`Dentist` schema.org JSON-LD** with exact NAP matching Google Business Profile character-for-character. `openingHoursSpecification`, `areaServed`, `hasMap`, `aggregateRating` only if genuinely sourced.
-- **Performance budget:** LCP < 2.0s and CLS < 0.05 on 4G/mid-tier Android. Hero video ≤ 1.5MB, `poster` always set, `preload="none"` below the fold. If the preloader and the hero video together blow the budget, the video loses.
+- **Performance budget:** LCP < 2.5s and CLS < 0.05 on 4G/mid-tier Android (see CLAUDE.md rule #13 and STATUS.md's performance investigation for how 2.5s was set). Hero video ≤ 1.5MB, `poster` always set, `preload="none"` below the fold. If the preloader and the hero video together blow the budget, the video loses.
 - **No AI-generated people.** Ever. Not the dentist, not staff, not patients, not before/afters. That's a trust and (for before/afters) advertising-claims problem. AI is for texture and ambience only — see the workflow doc.
 
 ---
