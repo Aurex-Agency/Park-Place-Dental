@@ -57,7 +57,7 @@ DESIGN-SYSTEM.md
 3. Animate only `transform`, `opacity`, `clip-path`, `filter`.
 4. Every animated component must have a `prefers-reduced-motion: reduce` path that is tested, not assumed.
 5. Reveals use `viewport={{ once: true }}`. Nothing re-animates on scroll-back.
-6. **`rose`/`rose-lift` are never used for text below `--text-h3` (24px), and never for body copy, labels, or form text on `navy`.** Measured: rose on navy is 4.4:1 — clears the 3:1 large-text AA minimum, fails the 4.5:1 normal-text minimum. Large decorative headline text and accent underlines/icons only. See the live, computed check at `/dev/tokens`.
+6. **`gold`/`gold-lift` are never used as text on `cream`, `sand`, or `white` — at any size.** Measured: gold on cream is 2.88:1, which fails even the 3:1 large-text AA minimum (sand and white are worse). Gold is a fill and mark color on light surfaces, not a text color: primary-CTA fills (with `ink` text, 5.88:1), hairlines, rules, decorative column motifs. Gold text is fine on `navy` (4.90:1, clears normal-text AA at any size) — that's the one place gold can be text. `brick` is emergency-only — the single place red appears as a solid fill on the site — and is not restricted like gold: white on brick is 6.89:1, brick on cream is 6.23:1, both pass everywhere they're used. See the live, computed check at `/dev/tokens`.
 
 **Content & compliance**
 7. **No AI-generated or stock images of people.** Not the dentist, staff, patients, or before/afters. Placeholders must be obvious gray boxes labeled `NEEDS REAL PHOTO: <description>` so nothing fake ships by accident.
@@ -84,4 +84,4 @@ DESIGN-SYSTEM.md
 ## Placeholders to fill
 
 Replace before launch — grep for `TODO(kalob)`:
-`TODO(kalob): phone` · `TODO(kalob): street address` · `TODO(kalob): dentist name + credentials` · `TODO(kalob): hours` · `TODO(kalob): insurances accepted` · `TODO(kalob): brand hexes sampled from logo` · `TODO(kalob): form endpoint`
+`TODO(kalob): phone` · `TODO(kalob): street address` · `TODO(kalob): dentist name + credentials` · `TODO(kalob): hours` · `TODO(kalob): insurances accepted` · `TODO(kalob): resample gold from the logo file` · `TODO(kalob): form endpoint`

@@ -27,7 +27,7 @@ export function MobileBottomBar() {
       <Link
         href="/contact"
         onClick={() => trackEvent("bottom_bar_request_appointment_click")}
-        className="flex flex-1 items-center justify-center bg-navy-mid py-4 text-body font-medium text-white outline-none focus-visible:ring-2 focus-visible:ring-focus"
+        className="flex flex-1 items-center justify-center bg-gold py-4 text-body font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-focus"
       >
         Request an Appointment
       </Link>

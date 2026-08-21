@@ -12,7 +12,7 @@ import { useScrolled } from "./use-scrolled";
 const SOLIDIFY_PX = 24;
 
 const LINK_CLASS =
-  "rounded-sm text-small outline-none focus-visible:ring-2 focus-visible:ring-focus";
+  "shrink-0 whitespace-nowrap rounded-sm text-small outline-none focus-visible:ring-2 focus-visible:ring-focus";
 
 /**
  * Solid by default (see TransparentHeroZone). Only floats transparent when
@@ -35,11 +35,11 @@ export function Nav() {
       }`}
     >
       <Container className={`flex items-center justify-between gap-2 py-4 ${textClass}`}>
-        <Link href="/" className="rounded-sm font-display text-h3 outline-none focus-visible:ring-2 focus-visible:ring-focus">
+        <Link href="/" className="shrink-0 whitespace-nowrap rounded-sm font-display text-h3 outline-none focus-visible:ring-2 focus-visible:ring-focus">
           {practice.name}
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-3 xl:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-2 xl:flex">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className={LINK_CLASS}>
               {link.label}
@@ -47,12 +47,23 @@ export function Nav() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-4 xl:flex">
+        <div className="hidden items-center gap-2 xl:flex">
           <a
             href={practice.nap.phoneHref}
             className={`${LINK_CLASS} font-medium underline-offset-4 hover:underline`}
           >
             {practice.nap.phone}
+          </a>
+          {/* Filled brick pill, not a text link: brick text fails badly on
+              navy (2.26:1), so a solid fill + white text is the only
+              treatment that stays legible in both Nav's transparent-over-
+              hero and solid states. Reachable directly, no menu — Gate 1's
+              fix for Phase 2 dropping this from the desktop row entirely. */}
+          <a
+            href="/emergency-dentist"
+            className="inline-flex shrink-0 items-center whitespace-nowrap rounded-pill bg-brick px-2 py-1 text-small font-bold text-white outline-none hover:bg-brick/90 focus-visible:ring-2 focus-visible:ring-focus"
+          >
+            Emergency
           </a>
           <SwapButton variant="primary" href="/contact">
             Request an Appointment
