@@ -127,7 +127,7 @@ export function PrimitivesSandbox() {
 
         <Section title="SwapButton" description="Two stacked label copies slide up one line-height on hover or focus-visible. Tab to each button to check the focus path.">
           <div className="flex flex-wrap items-center gap-4">
-            <SwapButton variant="primary">Request an Appointment</SwapButton>
+            <SwapButton variant="primary">Request a Visit</SwapButton>
             <SwapButton variant="ghost">Call (662) 728-8171</SwapButton>
             <SwapButton variant="danger">Emergency? Call now</SwapButton>
             <SwapButton variant="primary" href="tel:+16627288171">

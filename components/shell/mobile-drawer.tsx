@@ -183,7 +183,7 @@ export function MobileDrawer() {
             Emergency Dentist
           </SwapButton>
           <SwapButton variant="primary" href="/contact" onClick={close}>
-            Request an Appointment
+            Request a Visit
           </SwapButton>
         </div>
       </div>

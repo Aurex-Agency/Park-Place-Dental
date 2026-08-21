@@ -41,9 +41,13 @@ export function Nav() {
       }`}
     >
       <Container className={`flex items-center justify-between gap-1 py-4 ${textClass}`}>
+        {/* text-lead, not text-h3 — the smaller display step recovers real
+            width (was ~262px at text-h3) without inventing a new token
+            (rule #1: tokens only). py-2.5 (up from py-2) keeps the 44px hit
+            area even though the text itself shrank. */}
         <Link
           href="/"
-          className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm py-2 font-display text-h3 outline-none focus-visible:ring-2 focus-visible:ring-focus"
+          className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm py-2.5 font-display text-lead outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
           {practice.name}
         </Link>
@@ -96,7 +100,7 @@ export function Nav() {
             Emergency
           </a>
           <SwapButton variant="primary" href="/contact">
-            Request an Appointment
+            Request a Visit
           </SwapButton>
         </div>
 

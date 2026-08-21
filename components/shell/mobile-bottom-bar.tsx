@@ -30,10 +30,10 @@ export function MobileBottomBar() {
       </a>
       <Link
         href="/contact"
-        onClick={() => trackEvent("bottom_bar_request_appointment_click")}
+        onClick={() => trackEvent("bottom_bar_request_visit_click")}
         className="flex flex-1 items-center justify-center bg-gold py-4 text-body font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-focus"
       >
-        Request an Appointment
+        Request a Visit
       </Link>
     </div>
   );

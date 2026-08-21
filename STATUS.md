@@ -190,6 +190,38 @@ All ≥44px. Reporting this, not asserting it's fixed — the actual assertion l
 
 The Phase 2 LCP regression wasn't touched this gate either, per explicit instruction — still deferred to Phase 3.
 
+### Gate 3 correction — breakpoint still isn't at PLAN.md §3's 1024px target
+
+PR #7 review caught that `min-[1400px]:` puts every 1366×768 laptop, every 1280px window, and any non-maximized browser on a 1440 display into the hamburger — directly contradicting PLAN.md §3 ("no hamburger above 1024px"), which exists specifically because a hamburger-hidden nav was the client's own stated complaint about their current site. The breakpoint had moved `lg`(1024px) → `xl`(1280px) → `1400px` across three gates, each time by raising the threshold instead of reducing what has to fit — called out directly as the wrong pattern, and rightly so.
+
+**Two real content cuts made in response, not spacing tricks:**
+- CTA label: "Request an Appointment" → "Request a Visit" everywhere (nav, drawer, bottom bar, the `/dev/primitives` demo, and the `trackEvent` name it fires). "Request," not "Book" — `practice.bookingDisclaimer` exists specifically because the form produces a callback, not a confirmed appointment; "Book" would contradict that. Natural width dropped from 281px to 207px.
+- Logo: `font-display text-h3` → `font-display text-lead` — the next step down in the existing type scale, not a new token (rule #1). 262px → 182px at full size. Padding went from `py-2` to `py-2.5` specifically to hold the 44px hit area even though the text itself shrank.
+
+**Re-measured empirically at all 5 requested widths, not calculated** (Playwright `boundingBox()`, `/dev/shell`, `simulate`-free real layout):
+
+| Width | Result |
+|---|---|
+| 1024px | **overflow by 113.1px** |
+| 1280px | fits, 64.0px margin |
+| 1366px | fits, 68.3px margin |
+| 1440px | fits, 72.0px margin |
+| 1920px | fits, 336.0px margin |
+
+1024px genuinely doesn't work yet, even after both cuts. Per instruction, the breakpoint was **not** raised again to paper over that — reverted to the same `min-[1400px]:` the PR already had (the last known-working, already-open-for-review state) as a neutral holding position while this gets decided, not a new unilateral answer.
+
+**Real per-element widths at full size** (unconstrained, 1920px viewport), for whoever decides what else comes out:
+
+| Element | Width |
+|---|---|
+| Nav links (About/Services/New Patients/Contact) combined | ~326px |
+| Phone pill | 195px |
+| CTA button | 207px |
+| Emergency pill | 137px |
+| Logo | 182px |
+
+Closing a 113px gap from here means one of: dropping the Emergency pill from the persistent desktop row again (contradicts Gate 1's explicit fix, which put it there specifically so it's reachable without opening any menu), dropping or shrinking the phone pill's treatment (in tension with "phone number never behind a menu"), shortening a nav link label (an IA/content call, not an engineering one), or reducing `SwapButton`'s base padding sitewide (a bigger, unrequested design change since every CTA on the site uses it). None of these were decided here — flagged for a human call, per instruction.
+
 ## Next: Phase 3 (per KICKOFF-PROMPT.md)
 
 Home page sections (13 sections, DESIGN-SYSTEM.md §4), built from the Phase 1 motion primitives inside the Phase 2 shell. STOP for review before Phase 4 (interior page content replacing today's stubs).
