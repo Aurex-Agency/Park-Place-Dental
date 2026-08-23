@@ -34,3 +34,7 @@ pnpm-debug.log*
 next-env.d.ts
 .vercel
 .env*
+
+# Raw/unprocessed source photography and AI-generated originals — large,
+# and only the processed exports in public/images/ are ever served.
+_raw-photos/

@@ -52,6 +52,11 @@
   --tracking-hero: -0.03em;
   --leading-hero: 0.92;
   --leading-lead: 1.5;
+  /* bar.md M4: classical references letterspace their display caps
+     (0.05em+) — the opposite direction from --tracking-hero above, which
+     tightens giant display type. Positive tracking, paired with uppercase,
+     for the hero headline's inscription-like treatment. */
+  --tracking-display: 0.06em;
   --tracking-eyebrow: 0.12em;
 
   /* ---- Spacing & layout — §2 ---- */
