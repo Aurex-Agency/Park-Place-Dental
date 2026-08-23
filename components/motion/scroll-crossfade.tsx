@@ -68,10 +68,19 @@ export function ScrollCrossfade({
     }
   });
 
+  // fill and width/height are mutually exclusive on next/image — both
+  // layers here are sized by the wrapper (aspect-ratio box), not by the
+  // source image's own dimensions, so width/height from the shared
+  // PracticeImage/ImageProps shape must be dropped before spreading.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { width: baseWidth, height: baseHeight, ...baseRest } = baseImage;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { width: topWidth, height: topHeight, ...topRest } = topImage;
+
   return (
     <div ref={ref} className={`relative ${wrapperClassName ?? ""}`}>
       <Image
-        {...baseImage}
+        {...baseRest}
         alt={baseImage.alt}
         fill
         className={`object-cover ${baseImage.className ?? ""}`}
@@ -79,7 +88,7 @@ export function ScrollCrossfade({
       {!reducedMotion && (
         <motion.div data-motion-only className="absolute inset-0" style={{ clipPath }}>
           <Image
-            {...topImage}
+            {...topRest}
             alt={topImage.alt}
             fill
             className={`object-cover ${topImage.className ?? ""}`}

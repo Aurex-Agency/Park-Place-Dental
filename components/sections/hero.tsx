@@ -37,10 +37,14 @@ export function Hero() {
           {/* Quiet side — bar.md M4: letterspaced caps, lower-left, small
               relative to the object it's beside. */}
           <div>
+            {/* Static cap rule — bar.md M5 wants ≥2 hairlines per viewport;
+                the gold LineDraw below is the one accent-colored rule
+                (M3), this is the plain second one, cream not gold. */}
+            <div className="h-px w-12 bg-cream/25" />
             {/* text-cream, not text-gold — bar.md M3 caps gold at two
                 elements per viewport, and the hairline + CTA fill below
                 already spend both. */}
-            <p className="text-eyebrow uppercase tracking-eyebrow text-cream/70">{hero.eyebrow}</p>
+            <p className="mt-6 text-eyebrow uppercase tracking-eyebrow text-cream/70">{hero.eyebrow}</p>
             <SplitReveal
               as="h1"
               lines={[hero.headline]}
@@ -87,9 +91,9 @@ export function Hero() {
             </div>
           </div>
 
-          {/* The object — bar.md M1: 35-55% of frame. aspect-[4/3] matches
-              State B (the resting/no-JS/reduced-motion state) closely; State
-              A letterboxes very slightly within it via object-contain. */}
+          {/* The object — bar.md M1: 35-55% of frame. aspect-[4/3] box, both
+              states cropped to fill it via object-cover (see
+              scroll-crossfade.tsx's doc comment for why not object-contain). */}
           <ScrollCrossfade
             wrapperClassName="aspect-[4/3] w-full max-w-[520px] justify-self-center md:justify-self-end"
             baseImage={{
@@ -97,13 +101,14 @@ export function Hero() {
               alt: sculptureImages.stateB.alt,
               width: sculptureImages.stateB.width,
               height: sculptureImages.stateB.height,
-              preload: true,
+              sizes: "(min-width: 768px) 520px, 90vw",
             }}
             topImage={{
               src: sculptureImages.stateA.src,
               alt: sculptureImages.stateA.alt,
               width: sculptureImages.stateA.width,
               height: sculptureImages.stateA.height,
+              sizes: "(min-width: 768px) 520px, 90vw",
             }}
             onCompleteAction={() => setWipeComplete(true)}
           />

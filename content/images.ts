@@ -142,7 +142,7 @@ export const sculptureImages = {
     alt: "The same classical marble bust warmed to cream stone with a soft, alive smile",
     width: 1184,
     height: 880,
-    use: "Hero, base layer and priority LCP image. Warm state — always what a no-JS or reduced-motion visitor sees.",
+    use: "Hero, base layer. Warm state — always what a no-JS or reduced-motion visitor sees. Not marked next/image priority: measured via lhci that on the mobile viewport this hero's grid stacks the image below the text (bar.md M4's quiet side reads first), so the real LCP element is the subhead text, not this image — forcing priority here only competed with it for throttled bandwidth. See STATUS.md.",
   },
 } as const satisfies Record<string, PracticeImage>;
 

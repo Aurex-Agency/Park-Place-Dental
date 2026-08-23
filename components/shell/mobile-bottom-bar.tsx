@@ -23,13 +23,13 @@ import { trackEvent } from "@/lib/analytics";
 export function MobileBottomBar() {
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink/10 bg-cream/95 backdrop-blur min-[1120px]:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-cream/10 bg-navy/95 backdrop-blur min-[1120px]:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <a
         href={practice.nap.phoneHref}
         onClick={() => trackEvent("bottom_bar_call_click")}
-        className="flex flex-1 items-center justify-center py-4 text-body font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-focus"
+        className="flex flex-1 items-center justify-center py-4 text-body font-medium text-cream outline-none focus-visible:ring-2 focus-visible:ring-focus"
       >
         Call
       </a>

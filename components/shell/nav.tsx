@@ -29,17 +29,22 @@ const LINK_CLASS =
  * ThemeSection as the rest of the page scrolls by, only while transparent.
  */
 export function Nav() {
-  const { activeTheme, heroTransparent, drawerOpen, setDrawerOpen, drawerTriggerRef } = useShellChrome();
+  const { heroTransparent, drawerOpen, setDrawerOpen, drawerTriggerRef } = useShellChrome();
   const scrolled = useScrolled(SOLIDIFY_PX);
   const isSolid = !heroTransparent || scrolled;
-  const isOverDarkHero = !isSolid && activeTheme === "dark";
-  const textClass = isSolid || !isOverDarkHero ? "text-ink" : "text-cream";
+  // DIRECTION.md: "Nav | Solid navy, cream text, gold CTA" — navy/ink
+  // becomes the primary ground site-wide, and the old cream/ink solid nav
+  // read as a light SaaS bar sitting above it. Always cream text now: solid
+  // is navy, and the only other state (transparent over a dark hero) was
+  // already cream too, so there's no longer a light-background case to
+  // branch for.
+  const textClass = "text-cream";
 
   return (
     <header
       data-nav-state={isSolid ? "solid" : "transparent"}
       className={`fixed inset-x-0 top-0 z-50 transition-colors duration-[var(--dur-fast)] ${
-        isSolid ? "border-b border-ink/10 bg-cream/95 backdrop-blur" : "bg-transparent"
+        isSolid ? "border-b border-cream/10 bg-navy/95 backdrop-blur" : "bg-transparent"
       }`}
     >
       {/* Own wrapper, not the shared Container — Nav uses --nav-gutter
