@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { SwapButton } from "@/components/motion";
 import { practice } from "@/content/practice";
@@ -57,15 +58,27 @@ export function Nav() {
         {/* text-lead, not text-h3 — the smaller display step recovers real
             width (was ~262px at text-h3) without inventing a new token
             (rule #1: tokens only). py-2.5 (up from py-2) keeps the 44px hit
-            area even though the text itself shrank. */}
+            area even though the text itself shrank.
+
+            Cropped from public/brand/logo-gold-source.png (Gate 0) — only
+            the ionic-capital mark comes in as an image, the practice name
+            stays real text beside it. The mark renders its own sampled
+            color rather than the --color-gold UI token (WCAG 1.4.3 exempts
+            logotypes from text-contrast minimums; see DESIGN-SYSTEM.md §2)
+            and gets alt="" since the adjacent text is the link's real
+            accessible name. Restored here after being silently dropped —
+            was on phase-3-home (Gate 0/1) but that branch was never merged
+            into this one; the 1180px breakpoint above exists specifically
+            to fit this mark back in. */}
         <Link
           href="/"
-          className="inline-flex shrink-0 items-center whitespace-nowrap rounded-sm py-2.5 font-display text-lead outline-none focus-visible:ring-2 focus-visible:ring-focus"
+          className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap rounded-sm py-2.5 outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
-          {practice.name}
+          <Image src="/brand/logo-mark.png" alt="" width={400} height={174} priority className="h-3.5 w-auto" />
+          <span className="font-display text-lead">{practice.name}</span>
         </Link>
 
-        <nav aria-label="Primary" className="hidden items-center gap-1 min-[1120px]:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-1 min-[1180px]:flex">
           {NAV_LINKS.map((link) => (
             <Link key={link.href} href={link.href} className={LINK_CLASS}>
               {link.label}
@@ -73,7 +86,7 @@ export function Nav() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-2 min-[1120px]:flex">
+        <div className="hidden items-center gap-2 min-[1180px]:flex">
           {/* The phone number is the site's primary conversion (CLAUDE.md) —
               it read as the smallest, least prominent thing in the nav
               before Gate 3. Bordered pill + icon + bold text gives it real
@@ -123,7 +136,7 @@ export function Nav() {
           aria-expanded={drawerOpen}
           aria-controls="mobile-drawer"
           onClick={() => setDrawerOpen(true)}
-          className="rounded-sm p-2 outline-none focus-visible:ring-2 focus-visible:ring-focus min-[1120px]:hidden"
+          className="rounded-sm p-2 outline-none focus-visible:ring-2 focus-visible:ring-focus min-[1180px]:hidden"
         >
           <span className="sr-only">Open menu</span>
           <svg

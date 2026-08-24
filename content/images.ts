@@ -40,6 +40,36 @@ export type PracticeImage = {
  * The urns rhyme with the Ionic column in the logo — that's the classical note,
  * and it's genuine rather than imported.
  */
+/**
+ * PORTRAIT PAIR — for the half-page hero panel. 4:5, 1400x1750, cropped from
+ * the same source as the landscape pair and graded identically, so the two
+ * states are aligned by construction.
+ *
+ * The framed-plate hero was rejected — too small, and the centred composition
+ * read as an award certificate. The photo now fills one half of the viewport
+ * at full height and bleeds off the outer edge; type and CTAs sit on solid
+ * navy in the other half. No scrim anywhere, because text never crosses the
+ * photograph.
+ *
+ * All six people are fully in frame with the brick behind them. The urns are
+ * clipped at the edges — acceptable trade for getting the group large.
+ */
+export const heroStatesPortrait = {
+  cool: {
+    src: "/images/team-hero-portrait-cool.avif",
+    alt: "The Park Place Dental team outside the practice in Booneville, Mississippi",
+    width: 1400,
+    height: 1750,
+  },
+  warm: {
+    src: "/images/team-hero-portrait-warm.avif",
+    alt: "The Park Place Dental team outside the practice in Booneville, Mississippi",
+    width: 1400,
+    height: 1750,
+  },
+} as const;
+
+/** Landscape pair — kept for any full-bleed or wide-band use elsewhere. */
 export const heroStates = {
   cool: {
     src: "/images/team-hero-cool.avif",

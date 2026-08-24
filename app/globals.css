@@ -40,6 +40,13 @@
 
   /* ---- Type scale (fluid) — §2 ---- */
   --text-hero: clamp(3rem, 9vw, 9rem);
+  /* Same 3rem/9rem endpoints as --text-hero, shallower ramp (7.5vw, not
+     9vw). --text-hero's 9vw is calibrated against the full viewport width;
+     the hero split's headline lives in a half-width column, and at 9vw the
+     placeholder headline's first word overflowed that column at 1180-1440px
+     before this existed (measured, not assumed) — the 144px ceiling is the
+     same, it just takes a wider viewport to reach it. */
+  --text-hero-split: clamp(3rem, 6vw, 9rem);
   --text-d1: clamp(2.5rem, 6vw, 5.5rem);
   --text-d2: clamp(2rem, 4vw, 3.5rem);
   --text-h3: clamp(1.5rem, 2.5vw, 2rem);
