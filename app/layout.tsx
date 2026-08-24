@@ -9,7 +9,14 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
   axes: ["opsz", "SOFT", "WONK"],
   display: "swap",
-  preload: true,
+  // Not preloaded: STATUS.md's perf investigation flagged this as a Phase 3
+  // question once a real hero existed to test against. Now measured — the
+  // hero photo is the real LCP resource (bar.md/DIRECTION.md's framed-plate
+  // hero), and Fraunces' preload was queued ahead of it in <head>, competing
+  // for the same constrained early bandwidth under throttling. display:swap
+  // already means the fallback serif paints immediately regardless of
+  // preload, so this only delays the later font swap, not first paint.
+  preload: false,
 });
 
 const interTight = Inter_Tight({

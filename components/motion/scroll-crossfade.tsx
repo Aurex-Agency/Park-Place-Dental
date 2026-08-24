@@ -6,39 +6,36 @@ import { useEffect, useRef, useState } from "react";
 import { useMotionPreference } from "./motion-preference";
 
 type ScrollCrossfadeProps = {
-  /** Always visible, underneath — the resting/settled state. Should carry
-   * `priority` if this is the page's LCP image. */
+  /** Always visible, underneath — the resting/settled, warm-graded state.
+   * Should carry `priority` if this is the page's LCP image. */
   baseImage: ImageProps;
-  /** Wipes away via a bottom-up clip-path as the wrapper scrolls through the
-   * viewport, revealing baseImage. */
+  /** Fades to opacity 0 as the wrapper scrolls through the viewport,
+   * revealing baseImage underneath — a grade change, not a wipe. */
   topImage: ImageProps;
   wrapperClassName?: string;
-  /** Fires once, when the wipe is effectively complete (progress > 0.92) —
+  /** Fires once, when the fade is effectively complete (progress > 0.92) —
    * e.g. to trigger a companion LineDraw at the right moment. */
   onCompleteAction?: () => void;
 };
 
 /**
- * HERO-CONCEPT.md §5: "the stone dissolves and the warm version is
- * revealed." A scroll-linked bottom-up clip-path wipe over two stacked
- * next/image layers, completing across exactly one viewport of scroll
- * (useScroll's ["start start", "end start"] offsets land progress 0→1
- * across exactly the wrapper's own height, so a min-h-screen wrapper
- * finishes the wipe by the time it's scrolled fully past).
+ * A scroll-linked opacity crossfade over two stacked next/image layers —
+ * the cool-graded top layer dissolves to reveal the warm-graded base layer,
+ * completing across exactly one viewport of scroll (useScroll's
+ * ["start start", "end start"] offsets land progress 0→1 across exactly
+ * the wrapper's own height, so a min-h-screen wrapper finishes by the time
+ * it's scrolled fully past). Opacity, not a clip-path wipe: this is a
+ * colour-grade transition (cool → warm), and a wipe reads as a curtain
+ * uncovering a different image rather than the same photo warming up.
  *
  * No-JS: the top layer carries data-motion-only (global noscript rule in
  * app/layout.tsx sets `display: none`), so without JS only baseImage ever
  * renders — no separate fallback logic needed here.
  * Reduced motion: the top layer isn't rendered at all, same outcome.
  *
- * object-cover, not object-contain: baseImage and topImage are independent
- * generations and don't share a native aspect ratio. object-contain
- * letterboxes each to its own proportions inside the shared box, and since
- * their gaps land in different places, the layer underneath shows through
- * the top layer's letterbox bars — an unintended double-exposure at rest
- * (found by screenshotting the hero at scroll position 0, where the top
- * layer should fully cover the base layer and didn't). object-cover crops
- * both to the box's exact shape instead, so they align.
+ * object-cover: safe even when baseImage/topImage share a native aspect
+ * ratio (the intended case — same source pixels, cropped identically), and
+ * still correct if they ever don't.
  */
 export function ScrollCrossfade({
   baseImage,
@@ -49,8 +46,7 @@ export function ScrollCrossfade({
   const reducedMotion = useMotionPreference();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const insetBottom = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  const clipPath = useTransform(insetBottom, (v) => `inset(0% 0% ${v}% 0%)`);
+  const topOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
 
   // Same latest-ref pattern as Preloader/ThemeSection/StickySteps (STATUS.md
   // records the infinite-loop bug that pattern exists to prevent) — an
@@ -86,7 +82,7 @@ export function ScrollCrossfade({
         className={`object-cover ${baseImage.className ?? ""}`}
       />
       {!reducedMotion && (
-        <motion.div data-motion-only className="absolute inset-0" style={{ clipPath }}>
+        <motion.div data-motion-only className="absolute inset-0" style={{ opacity: topOpacity }}>
           <Image
             {...topRest}
             alt={topImage.alt}

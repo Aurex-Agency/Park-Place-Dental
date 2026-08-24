@@ -22,6 +22,39 @@ export type PracticeImage = {
   use: string;
 };
 
+/**
+ * HERO PAIR. The team outside the practice, brick wall behind, white classical
+ * urns flanking the group. Symmetrical and centred — so text does NOT sit on
+ * top of it. The hero composes as a framed plate: headline above on navy, the
+ * image below inside a gold hairline frame.
+ *
+ * Two states, cropped and graded from the SAME source pixels, so they are
+ * aligned by construction and cannot drift:
+ *   cool — desaturated, cooled, quiet. Where the scroll starts.
+ *   warm — full colour, warm, alive. Where the scroll lands.
+ *
+ * This replaces the marble-sculpture hero, which was rejected: a Roman bust on
+ * a small-town dental practice reads as absurd. The transformation idea
+ * survives; the subject is now real people at their real practice.
+ *
+ * The urns rhyme with the Ionic column in the logo — that's the classical note,
+ * and it's genuine rather than imported.
+ */
+export const heroStates = {
+  cool: {
+    src: "/images/team-hero-cool.avif",
+    alt: "The Park Place Dental team outside the practice in Booneville, Mississippi",
+    width: 2000,
+    height: 1125,
+  },
+  warm: {
+    src: "/images/team-hero-warm.avif",
+    alt: "The Park Place Dental team outside the practice in Booneville, Mississippi",
+    width: 2000,
+    height: 1125,
+  },
+} as const;
+
 export const images = {
   /**
    * HERO. Re-cropped from teamIndoor specifically for the split hero's photo
@@ -103,46 +136,6 @@ export const images = {
     width: 1536,
     height: 2048,
     use: "Office / what to expect section. Anxious visitors read a clean, warm waiting area as reassurance.",
-  },
-} as const satisfies Record<string, PracticeImage>;
-
-/**
- * Hero sculpture — AI-generated (Higgsfield), and deliberately NOT a photo of
- * a person. CLAUDE.md rule #7 ("no AI-generated or stock images of people")
- * governs depictions of the dentist, staff, or patients; this is a classical
- * marble bust used as a conceptual device — an artistic object, the same
- * category as a stock illustration or a generated texture, not a stand-in
- * for any real or implied person at the practice. HERO-CONCEPT.md /
- * bar.md / DIRECTION.md have the full reasoning and generation prompts.
- *
- * State A (cool grey marble) and State B (warmed cream marble, same pose/
- * framing/camera) are reference-conditioned edits of each other (Flux
- * Kontext, Higgsfield) verified pixel-aligned outside the mouth region
- * (0.09% structural drift, measured — see STATUS.md) before either was
- * accepted. Background removed via Higgsfield's own remover, palette-matched
- * (saturation pulled toward the site's actual cream/navy tokens — the raw
- * generations ran warmer/cooler than the tokens call for), then flattened
- * onto solid --color-navy rather than shipped as transparent PNGs — the two
- * states don't share a native aspect ratio, and stacking them live with
- * alpha transparency let the base layer bleed through the top layer's soft
- * cutout edge (found on the built hero, fixed at export time instead of
- * fighting it in CSS). Raw pre-crop generations and prompts are in
- * _raw-photos/higgsfield/ (gitignored).
- */
-export const sculptureImages = {
-  stateA: {
-    src: "/images/sculpture-state-a.avif",
-    alt: "A classical marble bust, cool grey stone, in profile",
-    width: 1600,
-    height: 1073,
-    use: "Hero, top layer. Cold state — scrolls/fades away to reveal stateB underneath.",
-  },
-  stateB: {
-    src: "/images/sculpture-state-b.avif",
-    alt: "The same classical marble bust warmed to cream stone with a soft, alive smile",
-    width: 1184,
-    height: 880,
-    use: "Hero, base layer. Warm state — always what a no-JS or reduced-motion visitor sees. Not marked next/image priority: measured via lhci that on the mobile viewport this hero's grid stacks the image below the text (bar.md M4's quiet side reads first), so the real LCP element is the subhead text, not this image — forcing priority here only competed with it for throttled bandwidth. See STATUS.md.",
   },
 } as const satisfies Record<string, PracticeImage>;
 
