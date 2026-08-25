@@ -111,15 +111,15 @@ export function MobileDrawer() {
         aria-modal="true"
         aria-label="Menu"
         ref={panelRef}
-        className="mobile-drawer-panel absolute inset-y-0 right-0 flex w-[min(20rem,85vw)] flex-col gap-8 overflow-y-auto bg-cream px-gutter py-8 shadow-soft"
+        className="mobile-drawer-panel absolute inset-y-0 right-0 flex w-[min(20rem,85vw)] flex-col gap-8 overflow-y-auto bg-navy px-gutter py-8 shadow-soft"
       >
         <div className="flex items-center justify-between">
-          <span className="font-display text-h3 text-ink">Menu</span>
+          <span className="font-display text-h3 text-cream">Menu</span>
           <button
             ref={closeButtonRef}
             type="button"
             onClick={close}
-            className="rounded-sm p-2 text-ink outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            className="rounded-sm p-2 text-cream outline-none focus-visible:ring-2 focus-visible:ring-focus"
           >
             <span className="sr-only">Close menu</span>
             <svg
@@ -147,7 +147,7 @@ export function MobileDrawer() {
               key={link.href}
               href={link.href}
               onClick={close}
-              className="flex items-center rounded-sm px-1 py-3 text-lead text-ink outline-none focus-visible:ring-2 focus-visible:ring-focus"
+              className="flex items-center rounded-sm px-1 py-3 text-lead text-cream outline-none focus-visible:ring-2 focus-visible:ring-focus"
             >
               {link.label}
             </Link>
@@ -155,12 +155,13 @@ export function MobileDrawer() {
         </nav>
 
         {/* Same "real visual weight" treatment as the desktop nav's phone
-            pill — the drawer panel is always cream/ink, so no need for the
-            border-current theming Nav's version uses. */}
+            pill — border-cream/30 to hold contrast against the drawer's
+            navy panel (matches Nav's border-current theming, just resolved
+            to the one color this panel is ever painted). */}
         <a
           href={practice.nap.phoneHref}
           onClick={close}
-          className="inline-flex items-center gap-2 self-start whitespace-nowrap rounded-pill border border-ink/30 px-4 py-2.5 text-lead font-semibold text-ink outline-none hover:border-ink/60 focus-visible:ring-2 focus-visible:ring-focus"
+          className="inline-flex items-center gap-2 self-start whitespace-nowrap rounded-pill border border-cream/30 px-4 py-2.5 text-lead font-semibold text-cream outline-none hover:border-cream/60 focus-visible:ring-2 focus-visible:ring-focus"
         >
           <svg
             viewBox="0 0 24 24"

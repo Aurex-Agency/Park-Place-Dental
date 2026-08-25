@@ -2,12 +2,35 @@
 
 import { animate, motion, useMotionValue, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { COLUMN_PATHS, COLUMN_VIEW_BOX } from "./column-paths";
+import { LineDraw } from "./line-draw";
 import { useMotionPreference } from "./motion-preference";
 
 const SESSION_KEY = "ppd-preloader-seen";
 const HARD_TIMEOUT_MS = 1400;
 const COUNT_DURATION_MS = 750;
 const CURTAIN_DURATION_MS = 600;
+
+/**
+ * BRAND-REVISION.md §3: "the column draws itself... while the counter
+ * runs." Staged to land inside COUNT_DURATION_MS (750ms) — bars first, then
+ * fluting rising, volutes spiraling in last and finishing right around when
+ * the count hits 100, so the drawing is complete before the curtain wipes,
+ * never cut off mid-stroke.
+ */
+const COLUMN_DRAW_STAGES: {
+  key: keyof typeof COLUMN_PATHS;
+  delay: number;
+  duration: number;
+  strokeWidth: number;
+}[] = [
+  { key: "topCap", delay: 0, duration: 0.12, strokeWidth: 2.5 },
+  { key: "thinRule", delay: 0.04, duration: 0.12, strokeWidth: 2.5 },
+  { key: "baseBar", delay: 0.08, duration: 0.16, strokeWidth: 3.5 },
+  { key: "fluting", delay: 0.14, duration: 0.3, strokeWidth: 2.5 },
+  { key: "leftVolute", delay: 0.32, duration: 0.4, strokeWidth: 2 },
+  { key: "rightVolute", delay: 0.32, duration: 0.4, strokeWidth: 2 },
+];
 
 function hasSeenThisSession(): boolean {
   try {
@@ -129,7 +152,20 @@ export function Preloader({ onCompleteAction }: { onCompleteAction?: () => void 
           animate={phase === "exiting" ? { y: "100%" } : { y: 0 }}
           transition={{ duration: CURTAIN_DURATION_MS / 1000, ease: [0.16, 1, 0.3, 1] }}
         />
-        <div className="relative z-10 flex h-full items-center justify-center">
+        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-6">
+          <div className="relative h-16 w-40 text-gold sm:h-20 sm:w-48">
+            {COLUMN_DRAW_STAGES.map((stage) => (
+              <LineDraw
+                key={stage.key}
+                path={COLUMN_PATHS[stage.key]}
+                viewBox={COLUMN_VIEW_BOX}
+                delay={stage.delay}
+                duration={stage.duration}
+                strokeWidth={stage.strokeWidth}
+                className="absolute inset-0 h-full w-full"
+              />
+            ))}
+          </div>
           <span className="font-display text-d1 tabular-nums text-cream">
             {String(displayCount).padStart(2, "0")}
           </span>

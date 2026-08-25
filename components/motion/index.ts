@@ -8,3 +8,6 @@ export { SwapButton } from "./swap-button";
 export { StickySteps, type Step } from "./sticky-steps";
 export { RevealImage } from "./reveal-image";
 export { ThemeSection } from "./theme-section";
+export { LineDraw } from "./line-draw";
+export { COLUMN_PATHS, COLUMN_VIEW_BOX, VOLUTE_VIEW_BOX } from "./column-paths";
+export { ScrollCrossfade } from "./scroll-crossfade";

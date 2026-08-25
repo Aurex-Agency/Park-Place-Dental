@@ -24,6 +24,7 @@ function Line({ line, delay, reducedMotion }: { line: string; delay: number; red
   return (
     <span ref={ref} className="block overflow-hidden">
       <motion.span
+        data-motion-reveal
         className="block"
         initial={{ y: reducedMotion ? 0 : "105%", opacity: 0 }}
         animate={inView ? { y: 0, opacity: 1 } : undefined}

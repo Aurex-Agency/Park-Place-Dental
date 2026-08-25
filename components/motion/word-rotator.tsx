@@ -37,6 +37,7 @@ export function WordRotator({ words, className, holdMs = 2200 }: WordRotatorProp
       <AnimatePresence mode="wait">
         <motion.span
           key={index}
+          data-motion-reveal
           className="block"
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

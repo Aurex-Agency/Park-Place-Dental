@@ -18,18 +18,20 @@ import { trackEvent } from "@/lib/analytics";
  * giving Nav its own tighter --nav-gutter instead of the body-prose
  * --spacing-gutter, then measuring the real fit threshold: exactly 0
  * margin at 1078px, stable at the full --nav-gutter (24px) margin from
- * 1120px on. 1120px is that stable point, not an arbitrary buffer.
+ * 1120px on. 1120px was that stable point for the text-only wordmark.
+ * Bumped to 1180px (Gate 0) once the logo mark image sat beside the
+ * wordmark again — the mark's own width needs the extra room.
  */
 export function MobileBottomBar() {
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink/10 bg-cream/95 backdrop-blur min-[1120px]:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-cream/10 bg-navy/95 backdrop-blur min-[1180px]:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <a
         href={practice.nap.phoneHref}
         onClick={() => trackEvent("bottom_bar_call_click")}
-        className="flex flex-1 items-center justify-center py-4 text-body font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-focus"
+        className="flex flex-1 items-center justify-center py-4 text-body font-medium text-cream outline-none focus-visible:ring-2 focus-visible:ring-focus"
       >
         Call
       </a>

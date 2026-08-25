@@ -40,8 +40,12 @@ function StepPanel({ step, index, onEnter }: { step: Step; index: number; onEnte
 
   return (
     <div ref={ref} className="flex flex-col gap-3">
-      {/* Mobile: number + label inline per panel, since the sticky rail is desktop-only */}
-      <p className="text-eyebrow text-navy-mid md:hidden">
+      {/* Mobile: number + label inline per panel, since the sticky rail is
+          desktop-only. text-body, not text-eyebrow — this is real step
+          content in the highest-converting section on the page, not a
+          decorative section label, and PLAN.md §4 sets a 17px floor for
+          this audience that text-eyebrow (13px) exists below on purpose. */}
+      <p className="text-body font-medium text-navy-mid md:hidden">
         {step.number} — {step.label}
       </p>
       <div className="text-lead text-ink/80">{step.detail}</div>
@@ -79,6 +83,7 @@ export function StickySteps({ steps, className, onActiveIndexChangeAction }: Sti
         <AnimatePresence mode="wait">
           <motion.div
             key={activeStep.number}
+            data-motion-reveal
             initial={{ opacity: reducedMotion ? 1 : 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: reducedMotion ? 1 : 0 }}

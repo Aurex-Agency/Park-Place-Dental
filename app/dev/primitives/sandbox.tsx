@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import {
+  COLUMN_PATHS,
+  COLUMN_VIEW_BOX,
+  LineDraw,
   MotionPreferenceProvider,
   Marquee,
   Odometer,
@@ -157,6 +160,34 @@ export function PrimitivesSandbox() {
               height={800}
               wrapperClassName="rounded-lg shadow-soft"
             />
+          </div>
+        </Section>
+
+        <Section
+          title="LineDraw"
+          description="Animates an SVG path's stroke-dashoffset from full length to zero on scroll-in. The demo below layers six instances — one per column-draw path in components/motion/column-paths.ts, derived from the real logo mark — staggered into the same composite the Preloader draws. Reduced motion renders it complete, no animation."
+        >
+          <div className="relative h-44 w-full max-w-[420px]">
+            {(
+              [
+                ["topCap", 0, 2],
+                ["thinRule", 0.15, 2],
+                ["baseBar", 0.3, 3],
+                ["fluting", 0.5, 2],
+                ["leftVolute", 0.9, 1.6],
+                ["rightVolute", 0.9, 1.6],
+              ] as const
+            ).map(([key, delay, strokeWidth]) => (
+              <LineDraw
+                key={key}
+                path={COLUMN_PATHS[key]}
+                viewBox={COLUMN_VIEW_BOX}
+                delay={delay}
+                strokeWidth={strokeWidth}
+                duration={key === "leftVolute" || key === "rightVolute" ? 1.4 : 0.8}
+                className="absolute inset-0 h-full w-full text-gold"
+              />
+            ))}
           </div>
         </Section>
 

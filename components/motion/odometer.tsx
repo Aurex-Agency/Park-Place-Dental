@@ -61,8 +61,15 @@ export function Odometer({ value, prefix, suffix, className }: OdometerProps) {
   return (
     <span ref={ref} className={`inline-flex items-center tabular-nums ${className ?? ""}`}>
       {/* Rolling digit strips render every 0-9 row in the DOM, which reads as
-          gibberish to a screen reader — hide them and announce the real value instead. */}
-      <span aria-hidden="true" className="inline-flex items-center">
+          gibberish to a screen reader — hide them and announce the real
+          value instead. Without JS this whole strip never rolls (each
+          DigitColumn's animate is JS-driven), leaving it stuck at digit "0"
+          — not just illegible but visibly wrong, so it's marked
+          data-motion-only (hidden under noscript, see app/layout.tsx)
+          rather than data-motion-reveal, and the sr-only fallback below is
+          promoted to visible in its place instead of staying screen-reader
+          only. */}
+      <span data-motion-only aria-hidden="true" className="inline-flex items-center">
         {prefix}
         {inView
           ? digits.map((digit, index) => (
@@ -78,7 +85,7 @@ export function Odometer({ value, prefix, suffix, className }: OdometerProps) {
             ))}
         {suffix}
       </span>
-      <span className="sr-only">
+      <span data-motion-fallback className="sr-only">
         {prefix}
         {digits.join("")}
         {suffix}

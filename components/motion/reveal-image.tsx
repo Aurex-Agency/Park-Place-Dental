@@ -25,6 +25,7 @@ export function RevealImage({ wrapperClassName, alt, className, ...imageProps }:
   return (
     <span ref={ref} className={`block overflow-hidden ${wrapperClassName ?? ""}`}>
       <motion.div
+        data-motion-reveal
         initial={{ clipPath: reducedMotion ? "inset(0% 0% 0% 0%)" : "inset(100% 0% 0% 0%)", opacity: reducedMotion ? 0 : 1 }}
         animate={inView ? { clipPath: "inset(0% 0% 0% 0%)", opacity: 1 } : undefined}
         transition={{
@@ -33,6 +34,7 @@ export function RevealImage({ wrapperClassName, alt, className, ...imageProps }:
         }}
       >
         <motion.div
+          data-motion-reveal
           initial={{ scale: reducedMotion ? 1 : 1.08 }}
           animate={inView ? { scale: 1 } : undefined}
           transition={{
